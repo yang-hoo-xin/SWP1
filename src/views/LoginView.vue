@@ -3,7 +3,9 @@
     <!-- App Header -->
     <div class="app-header">
       <div class="logo">
-        <el-icon size="24"><ChatDotSquare /></el-icon>
+        <div class="logo-icon-wrapper">
+          <el-icon size="24"><ChatDotSquare /></el-icon>
+        </div>
         <span>AI Assistant</span>
       </div>
       <div class="header-actions">
@@ -14,99 +16,149 @@
       </div>
     </div>
 
-    <!-- 粒子动画效果的替代方案 - 使用纯CSS -->
-    <div class="particle-container">
-      <div v-for="i in 20" :key="`p-${i}`" class="particle" 
-           :style="{
-              '--x': `${Math.random() * 100}%`,
-              '--y': `${Math.random() * 100}%`,
-              '--size': `${Math.random() * 5 + 1}px`,
-              '--duration': `${Math.random() * 60 + 20}s`,
-              '--delay': `${Math.random() * -30}s`
-           }"></div>
-    </div>
-    
-    <!-- 浮动气泡 -->
-    <div class="bubbles">
-      <div class="bubble" v-for="i in 10" :key="`b-${i}`" :style="{ 
-        '--size': `${20 + Math.random() * 60}px`,
-        '--distance': `${6 + Math.random() * 4}`,
-        '--position': `${-5 + Math.random() * 110}%`,
-        '--time': `${2 + Math.random() * 2}s`,
-        '--delay': `${-1 * (2 + Math.random() * 2)}s`,
-      }"></div>
-    </div>
+    <!-- Main Content - Split Layout -->
+    <div class="main-content">
+      <!-- 粒子动画效果的替代方案 - 使用纯CSS -->
+      <div class="particle-container">
+        <div v-for="i in 20" :key="`p-${i}`" class="particle" 
+             :style="{
+                '--x': `${Math.random() * 100}%`,
+                '--y': `${Math.random() * 100}%`,
+                '--size': `${Math.random() * 5 + 1}px`,
+                '--duration': `${Math.random() * 60 + 20}s`,
+                '--delay': `${Math.random() * -30}s`
+             }"></div>
+      </div>
+      
+      <!-- 浮动气泡 -->
+      <div class="bubbles">
+        <div class="bubble" v-for="i in 10" :key="`b-${i}`" :style="{ 
+          '--size': `${20 + Math.random() * 60}px`,
+          '--distance': `${6 + Math.random() * 4}`,
+          '--position': `${-5 + Math.random() * 110}%`,
+          '--time': `${2 + Math.random() * 2}s`,
+          '--delay': `${-1 * (2 + Math.random() * 2)}s`,
+        }"></div>
+      </div>
 
-    <div class="login-box-container">
-      <div class="login-box">
-        <!-- Logo and branding with 3D hover effect -->
-        <div class="logo-area">
-          <div class="logo-animation">
-            <span class="logo-icon">
-              <el-icon size="36"><ChatDotSquare /></el-icon>
-            </span>
+      <!-- Left Column - Login Form -->
+      <div class="login-column">
+        <div class="login-box">
+          <div class="logo-area">
+            <div class="logo-animation">
+              <span class="logo-icon">
+                <el-icon size="36"><ChatDotSquare /></el-icon>
+              </span>
+            </div>
+            <h1 class="animated-text">AI Assistant</h1>
+            <p>Your intelligent conversation partner</p>
+            <div class="shine-line"></div>
           </div>
-          <h1 class="animated-text">AI Assistant</h1>
-          <p>Your intelligent conversation partner</p>
-          <div class="shine-line"></div>
+          
+          <el-form :model="loginForm" :rules="loginRules" ref="loginFormRef" class="login-form">
+            <div class="form-item-animated">
+              <el-form-item prop="username">
+                <el-input 
+                  v-model="loginForm.username" 
+                  prefix-icon="User" 
+                  placeholder="Username" 
+                  size="large"
+                  class="animate-input"
+                />
+              </el-form-item>
+            </div>
+            
+            <div class="form-item-animated" style="animation-delay: 0.1s;">
+              <el-form-item prop="password">
+                <el-input 
+                  v-model="loginForm.password" 
+                  prefix-icon="Lock" 
+                  type="password" 
+                  placeholder="Password" 
+                  size="large"
+                  class="animate-input" 
+                  @keyup.enter="handleLogin"
+                />
+              </el-form-item>
+            </div>
+            
+            <div class="form-item-animated" style="animation-delay: 0.2s;">
+              <el-form-item class="login-options">
+                <el-checkbox v-model="loginForm.rememberMe">Remember me</el-checkbox>
+                <el-link type="primary" :underline="false" class="hover-effect">Forgot password?</el-link>
+              </el-form-item>
+            </div>
+            
+            <div class="form-item-animated" style="animation-delay: 0.3s;">
+              <el-form-item>
+                <el-button 
+                  type="primary" 
+                  :loading="loading" 
+                  class="login-button ripple-effect" 
+                  @click="handleLogin"
+                >
+                  <span class="button-text">Login</span>
+                  <span class="button-icon">
+                    <el-icon><ArrowRight /></el-icon>
+                  </span>
+                </el-button>
+              </el-form-item>
+            </div>
+          </el-form>
+
+          <div class="form-item-animated" style="animation-delay: 0.4s;">
+            <div class="login-footer">
+              <p>Don't have an account? <el-link type="primary" :underline="false" class="hover-effect">Sign up</el-link></p>
+            </div>
+          </div>
         </div>
-        
-        <!-- Login form with animated inputs -->
-        <el-form :model="loginForm" :rules="loginRules" ref="loginFormRef" class="login-form">
-          <div class="form-item-animated">
-            <el-form-item prop="username">
-              <el-input 
-                v-model="loginForm.username" 
-                prefix-icon="User" 
-                placeholder="Username" 
-                size="large"
-                class="animate-input"
-              />
-            </el-form-item>
+      </div>
+      
+      <!-- Right Column - Features -->
+      <div class="features-column">
+        <div class="features-content">
+          <h2>Welcome to AI Assistant</h2>
+          <p class="subtitle">The next generation of intelligent conversation</p>
+          
+          <div class="features-grid">
+            <div class="feature-card">
+              <div class="feature-icon">
+                <el-icon size="28"><ChatLineRound /></el-icon>
+              </div>
+              <h3>Smart Conversations</h3>
+              <p>Engage in natural, intelligent conversations with state-of-the-art AI technology.</p>
+            </div>
+            
+            <div class="feature-card">
+              <div class="feature-icon">
+                <el-icon size="28"><Connection /></el-icon>
+              </div>
+              <h3>Knowledge Integration</h3>
+              <p>Access vast knowledge and get accurate information on various topics instantly.</p>
+            </div>
+            
+            <div class="feature-card">
+              <div class="feature-icon">
+                <el-icon size="28"><Histogram /></el-icon>
+              </div>
+              <h3>Data Analysis</h3>
+              <p>Process and analyze complex data with intelligent AI insights.</p>
+            </div>
+            
+            <div class="feature-card">
+              <div class="feature-icon">
+                <el-icon size="28"><Monitor /></el-icon>
+              </div>
+              <h3>Multi-device Access</h3>
+              <p>Access your AI assistant across all your devices seamlessly.</p>
+            </div>
           </div>
           
-          <div class="form-item-animated" style="animation-delay: 0.1s;">
-            <el-form-item prop="password">
-              <el-input 
-                v-model="loginForm.password" 
-                prefix-icon="Lock" 
-                type="password" 
-                placeholder="Password" 
-                size="large"
-                class="animate-input" 
-                @keyup.enter="handleLogin"
-              />
-            </el-form-item>
-          </div>
-          
-          <div class="form-item-animated" style="animation-delay: 0.2s;">
-            <el-form-item class="login-options">
-              <el-checkbox v-model="loginForm.rememberMe">Remember me</el-checkbox>
-              <el-link type="primary" :underline="false" class="hover-effect">Forgot password?</el-link>
-            </el-form-item>
-          </div>
-          
-          <div class="form-item-animated" style="animation-delay: 0.3s;">
-            <el-form-item>
-              <el-button 
-                type="primary" 
-                :loading="loading" 
-                class="login-button ripple-effect" 
-                @click="handleLogin"
-              >
-                <span class="button-text">Login</span>
-                <span class="button-icon">
-                  <el-icon><ArrowRight /></el-icon>
-                </span>
-              </el-button>
-            </el-form-item>
-          </div>
-        </el-form>
-
-        <!-- Footer section with a subtle animation -->
-        <div class="form-item-animated" style="animation-delay: 0.4s;">
-          <div class="login-footer">
-            <p>Don't have an account? <el-link type="primary" :underline="false" class="hover-effect">Sign up</el-link></p>
+          <div class="testimonials">
+            <div class="testimonial">
+              <div class="quote">"This AI assistant has revolutionized how I interact with technology."</div>
+              <div class="author">- John D., Product Manager</div>
+            </div>
           </div>
         </div>
       </div>
@@ -114,7 +166,7 @@
     
     <!-- App footer -->
     <div class="app-footer">
-      <div>© 2024 AI Assistant</div>
+      <div>© 2025 AI Assistant</div>
       <div class="footer-links">
         <el-link type="info" :underline="false">Privacy</el-link>
         <el-link type="info" :underline="false">Terms</el-link>
@@ -231,16 +283,137 @@ export default defineComponent({
 .login-container {
   width: 100vw;
   height: 100vh;
+  margin: 0 !important;
+  padding: 0 !important;
+  position: absolute !important;
+  left: 0 !important;
+  top: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: space-between;
-  position: relative;
   overflow: hidden;
   background: linear-gradient(135deg, #4b6cb7 0%, #182848 100%);
   box-sizing: border-box;
-  padding: 0;
+}
+
+// Main content area with split layout
+.main-content {
+  flex: 1;
+  display: flex;
+  width: 100%;
+  overflow: hidden;
   margin: 0;
+  padding: 0;
+}
+
+// Login column (left side)
+.login-column {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  position: relative;
+  z-index: 2;
+  max-width: 50%;
+  min-width: 450px;
+  margin-left: 0;
+}
+
+// Features column (right side)
+.features-column {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  position: relative;
+  z-index: 2;
+  color: white;
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(10px);
+  
+  h2 {
+    font-size: 32px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: white;
+  }
+  
+  .subtitle {
+    font-size: 18px;
+    margin-bottom: 40px;
+    color: rgba(255, 255, 255, 0.8);
+  }
+  
+  .features-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    margin-bottom: 40px;
+  }
+  
+  .feature-card {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 24px;
+    transition: all 0.3s ease;
+    
+    &:hover {
+      transform: translateY(-5px);
+      background: rgba(255, 255, 255, 0.15);
+    }
+    
+    .feature-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 60px;
+      height: 60px;
+      border-radius: 12px;
+      background: rgba(75, 108, 183, 0.7);
+      margin-bottom: 16px;
+    }
+    
+    h3 {
+      font-size: 18px;
+      margin-bottom: 10px;
+      font-weight: 600;
+    }
+    
+    p {
+      color: rgba(255, 255, 255, 0.8);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+  }
+  
+  .testimonials {
+    margin-top: 30px;
+    
+    .testimonial {
+      font-style: italic;
+      border-left: 3px solid rgba(75, 108, 183, 0.8);
+      padding-left: 20px;
+      
+      .quote {
+        font-size: 16px;
+        margin-bottom: 10px;
+        color: rgba(255, 255, 255, 0.9);
+      }
+      
+      .author {
+        font-size: 14px;
+        color: rgba(255, 255, 255, 0.7);
+      }
+    }
+  }
+}
+
+.features-content {
+  max-width: 700px;
+  width: 100%;
 }
 
 // App header
@@ -259,11 +432,18 @@ export default defineComponent({
   
   .logo {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: 10px;
+    gap: 5px;
     font-size: 18px;
     font-weight: 600;
     color: white;
+    
+    .logo-icon-wrapper {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
   }
   
   .header-actions {
@@ -304,19 +484,79 @@ export default defineComponent({
   }
 }
 
-// Login box container with glass effect
-.login-box-container {
-  position: relative;
-  z-index: 2;
-  animation: fadeIn 0.8s ease-out forwards;
-  perspective: 1000px;
+// Login box with glass effect
+.login-box {
   width: 100%;
   max-width: 440px;
-  padding: 0 20px;
-  margin: auto;
+  padding: 40px;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  transform: translateY(20px);
+  animation: slideUp 0.8s ease-out forwards;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  
+  &:hover {
+    box-shadow: 0 15px 35px 0 rgba(31, 38, 135, 0.5);
+  }
 }
 
-// Hide elements on small screens
+// CSS Particles animation (more performant than JS)
+.particle-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.particle {
+  position: absolute;
+  top: var(--y);
+  left: var(--x);
+  width: var(--size);
+  height: var(--size);
+  background-color: rgba(255, 255, 255, 0.6);
+  border-radius: 50%;
+  animation: particle-float var(--duration) ease-in-out var(--delay) infinite;
+  z-index: 0;
+}
+
+// Responsive adjustments
+@media (max-width: 1200px) {
+  .features-column .features-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 992px) {
+  .main-content {
+    flex-direction: column;
+  }
+  
+  .login-column, .features-column {
+    max-width: 100%;
+  }
+  
+  .features-column {
+    padding: 30px;
+  }
+}
+
+@media (max-width: 768px) {
+  .features-column {
+    display: none; // Hide features on mobile
+  }
+  
+  .login-column {
+    flex: 1;
+  }
+}
+
 @media (max-width: 600px) {
   .hidden-xs {
     display: none;
@@ -335,14 +575,8 @@ export default defineComponent({
 }
 
 @media (max-width: 480px) {
-  .login-box-container {
-    max-width: 100%;
-    padding: 0 15px;
-  }
-  
   .login-box {
     padding: 30px 20px;
-    width: 100%;
   }
   
   .logo-area h1 {
@@ -373,10 +607,14 @@ export default defineComponent({
   text-align: center;
   margin-bottom: 35px;
   position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   
   h1 {
     font-size: 28px;
     font-weight: 600;
+    margin-top: 16px;
     margin-bottom: 8px;
     color: #1a2743;
     text-shadow: 0 1px 2px rgba(0,0,0,0.1);
@@ -700,28 +938,5 @@ export default defineComponent({
     transform: scale(1);
     box-shadow: 0 0 0 0 rgba(75, 108, 183, 0);
   }
-}
-
-// CSS Particles animation (more performant than JS)
-.particle-container {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 1;
-  overflow: hidden;
-}
-
-.particle {
-  position: absolute;
-  top: var(--y);
-  left: var(--x);
-  width: var(--size);
-  height: var(--size);
-  background-color: rgba(255, 255, 255, 0.6);
-  border-radius: 50%;
-  animation: particle-float var(--duration) ease-in-out var(--delay) infinite;
-  z-index: 0;
 }
 </style> 
