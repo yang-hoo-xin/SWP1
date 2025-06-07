@@ -198,6 +198,7 @@ import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { useAuthStore } from '../stores/auth'
+import authService from '../services/authService'
 
 // Router and auth store
 const router = useRouter()
@@ -211,12 +212,6 @@ const loginForm = reactive({
   password: '',
   rememberMe: false
 })
-
-// 模拟用户数据库
-const mockUsers = [
-  { username: 'demo', password: 'password123', role: 'user' },
-  { username: 'admin', password: 'admin123', role: 'admin' }
-]
 
 // Form validation rules
 const loginRules = {
@@ -266,29 +261,21 @@ const handleLogin = async () => {
         const logoElement = document.querySelector('.logo-animation');
         if (logoElement) logoElement.classList.add('pulse');
         
-        // 使用模拟数据登录逻辑
-        await new Promise(resolve => setTimeout(resolve, 1000))
+        // 使用 authService 进行真实的API登录
+        const response = await authService.login(loginForm.username, loginForm.password);
         
-        // 验证用户名和密码
-        const user = mockUsers.find(
-          u => u.username === loginForm.username && u.password === loginForm.password
-        )
+        // Store authentication info
+        authStore.login({
+          username: loginForm.username,
+          token: response.token,
+          rememberMe: loginForm.rememberMe
+        });
         
-        if (user) {
-          // Store authentication info
-          authStore.login({
-            username: user.username,
-            token: 'mock-token-' + Date.now(),
-            rememberMe: loginForm.rememberMe
-          })
-          
-          ElMessage.success('Login successful')
-          router.push('/chat')
-        } else {
-          throw new Error('Invalid username or password')
-        }
+        ElMessage.success('Login successful')
+        router.push('/chat')
       } catch (error) {
         ElMessage.error('Login failed: ' + (error instanceof Error ? error.message : 'Unknown error'))
+        console.error('Login error:', error);
         
         // Remove animation if there's an error
         const logoElement = document.querySelector('.logo-animation');
