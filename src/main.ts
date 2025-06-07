@@ -26,4 +26,11 @@ for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
   app.component(key, component)
 }
 
+// 添加全局认证错误处理
+window.addEventListener('auth-error', (event) => {
+  const customEvent = event as CustomEvent;
+  console.log('Auth error detected:', customEvent.detail);
+  router.push('/login');
+});
+
 app.mount('#app')

@@ -7,6 +7,10 @@ const router = createRouter({
   routes: [
     {
       path: '/',
+      redirect: '/login'
+    },
+    {
+      path: '/login',
       name: 'login',
       component: LoginView,
       meta: { requiresAuth: false }
@@ -26,9 +30,6 @@ const router = createRouter({
     {
       path: '/about',
       name: 'about',
-      // route level code-splitting
-      // this generates a separate chunk (About.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
       component: () => import('../views/AboutView.vue'),
       meta: { requiresAuth: false }
     },
@@ -37,17 +38,26 @@ const router = createRouter({
 
 // Navigation guard for authentication
 router.beforeEach((to, from, next) => {
-  const authStore = useAuthStore()
-  const requiresAuth = to.matched.some(record => record.meta.requiresAuth)
+  console.log(`路由导航: 从 ${from.path} 到 ${to.path}`);
   
-  if (requiresAuth && !authStore.isAuthenticated) {
+  const authStore = useAuthStore()
+  const isAuthenticated = authStore.isAuthenticated;
+  console.log('当前认证状态:', isAuthenticated);
+  
+  const requiresAuth = to.matched.some(record => record.meta.requiresAuth)
+  console.log('目标路由需要认证:', requiresAuth);
+  
+  if (requiresAuth && !isAuthenticated) {
     // Redirect to login page if not authenticated
-    next({ name: 'login' })
-  } else if (to.name === 'login' && authStore.isAuthenticated) {
+    console.log('未认证，重定向到登录页面');
+    next({ name: 'login' });
+  } else if (to.name === 'login' && isAuthenticated) {
     // Redirect to chat if already authenticated
-    next({ name: 'chat' })
+    console.log('已认证，从登录页重定向到聊天页面');
+    next({ name: 'chat' });
   } else {
-    next()
+    console.log('正常导航到:', to.path);
+    next();
   }
 })
 

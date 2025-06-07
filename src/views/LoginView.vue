@@ -51,7 +51,7 @@
               </span>
             </div>
             <h1 class="animated-text">AI Assistant</h1>
-            <p>您的智能对话伙伴</p>
+            <p>Your Intelligent Conversation Partner</p>
             <div class="shine-line"></div>
           </div>
           
@@ -59,15 +59,15 @@
             <div class="action-bubbles">
               <div class="action-bubble new-chat" @click="redirectToChat">
                 <el-icon><Plus /></el-icon>
-                <span>新建聊天</span>
+                <span>New Chat</span>
               </div>
               <div class="action-bubble continue-chat" @click="redirectToChat">
                 <el-icon><ChatLineRound /></el-icon>
-                <span>继续对话</span>
+                <span>Continue Chat</span>
               </div>
               <div class="action-bubble settings" @click="redirectToChatWithSettings">
                 <el-icon><Setting /></el-icon>
-                <span>个性化设置</span>
+                <span>Settings</span>
               </div>
             </div>
           </div>
@@ -99,10 +99,30 @@
               </el-form-item>
             </div>
             
+            <div class="form-item-animated" style="animation-delay: 0.15s;">
+              <el-form-item prop="captcha">
+                <div class="captcha-container">
+                  <el-input 
+                    v-model="loginForm.captcha" 
+                    prefix-icon="Key" 
+                    placeholder="Captcha" 
+                    size="large"
+                    class="animate-input captcha-input" 
+                  />
+                  <div class="captcha-image" @click="refreshCaptcha" title="Click to refresh">
+                    <img v-if="captchaImage" :src="captchaImage" alt="Captcha" />
+                    <div v-else class="captcha-loading">
+                      <el-icon><Loading /></el-icon>
+                    </div>
+                  </div>
+                </div>
+              </el-form-item>
+            </div>
+            
             <div class="form-item-animated" style="animation-delay: 0.2s;">
               <el-form-item class="login-options">
                 <el-checkbox v-model="loginForm.rememberMe">Remember me</el-checkbox>
-                <el-link type="primary" :underline="false" class="hover-effect">Forgot password?</el-link>
+                <el-link type="primary" underline="never" class="hover-effect">Forgot password?</el-link>
               </el-form-item>
             </div>
             
@@ -125,7 +145,7 @@
 
           <div class="form-item-animated" style="animation-delay: 0.4s;">
             <div class="login-footer">
-              <p>Don't have an account? <el-link type="primary" :underline="false" class="hover-effect">Sign up</el-link></p>
+              <p>Don't have an account? <el-link type="primary" underline="never" class="hover-effect">Sign up</el-link></p>
             </div>
           </div>
         </div>
@@ -185,9 +205,9 @@
     <div class="app-footer">
       <div>© 2025 AI Assistant</div>
       <div class="footer-links">
-        <el-link type="info" :underline="false">Privacy</el-link>
-        <el-link type="info" :underline="false">Terms</el-link>
-        <el-link type="info" :underline="false">Contact</el-link>
+        <el-link type="info" underline="never">Privacy</el-link>
+        <el-link type="info" underline="never">Terms</el-link>
+        <el-link type="info" underline="never">Contact</el-link>
       </div>
     </div>
   </div>
@@ -207,24 +227,35 @@ const authStore = useAuthStore()
 // Form data
 const loginFormRef = ref()
 const loading = ref(false)
+const captchaImage = ref('')
+const captchaUuid = ref('')
+
 const loginForm = reactive({
   username: '',
   password: '',
-  rememberMe: false
+  rememberMe: false,
+  captcha: ''
 })
 
-// Form validation rules
+// Enhanced form validation rules
 const loginRules = {
   username: [
     { required: true, message: 'Please enter username', trigger: 'blur' },
+    { min: 3, message: 'Username must be at least 3 characters', trigger: 'blur' }
   ],
   password: [
     { required: true, message: 'Please enter password', trigger: 'blur' },
+    { min: 6, message: 'Password must be at least 6 characters', trigger: 'blur' }
+  ],
+  captcha: [
+    { required: true, message: 'Please enter captcha', trigger: 'blur' },
+    { min: 4, max: 6, message: 'Captcha should be 4-6 characters', trigger: 'blur' }
   ]
 }
 
-// Setup ripple effect for buttons
+// Fetch captcha on component mount
 onMounted(() => {
+  // Setup ripple effect for buttons
   document.querySelector('.login-container')?.addEventListener('click', (e) => {
     const mouseEvent = e as MouseEvent; // Type assertion to MouseEvent
     const target = mouseEvent.target as HTMLElement;
@@ -247,48 +278,141 @@ onMounted(() => {
       }, 600);
     }
   });
+  
+  // Load captcha when component mounts
+  refreshCaptcha();
 });
+
+// Refresh captcha
+const refreshCaptcha = async () => {
+  try {
+    // Clear current captcha while loading
+    captchaImage.value = '';
+    captchaUuid.value = '';
+    
+    // Show loading state
+    loading.value = true;
+    
+    console.log('Requesting new captcha...');
+    const captchaData = await authApi.getCaptcha();
+    console.log('Captcha data received:', captchaData);
+    
+    if (captchaData && captchaData.img && captchaData.uuid) {
+      captchaImage.value = captchaData.img;
+      captchaUuid.value = captchaData.uuid;
+      console.log('Captcha loaded successfully, uuid:', captchaUuid.value);
+    } else {
+      throw new Error('Invalid captcha data received');
+    }
+  } catch (error) {
+    console.error('Failed to load captcha:', error);
+    
+    // Show a user-friendly error message
+    ElMessage.error({
+      message: 'Failed to load captcha. Please try again later.',
+      duration: 5000
+    });
+  } finally {
+    loading.value = false;
+  }
+};
 
 // Handle login
 const handleLogin = async () => {
   if (!loginFormRef.value) return
   
-  await loginFormRef.value.validate(async (valid: boolean) => {
-    if (valid) {
-      loading.value = true
-      try {
-        // Show a pulse animation on the logo during login
-        const logoElement = document.querySelector('.logo-animation');
-        if (logoElement) logoElement.classList.add('pulse');
-        
-        // Use authApi for real API login
-        const response = await authApi.login(loginForm.username, loginForm.password);
-        
-        // Store authentication info
-        authStore.login({
-          username: loginForm.username,
-          token: response.token,
-          rememberMe: loginForm.rememberMe
-        });
-        
-        ElMessage.success('Login successful')
-        router.push('/chat')
-      } catch (error) {
-        ElMessage.error('Login failed: ' + (error instanceof Error ? error.message : 'Unknown error'))
-        console.error('Login error:', error);
-        
-        // Remove animation if there's an error
-        const logoElement = document.querySelector('.logo-animation');
-        if (logoElement) logoElement.classList.remove('pulse');
-      } finally {
-        loading.value = false
-      }
+  // Clear previous validation errors
+  loginFormRef.value.clearValidate();
+  
+  // Validate form before API call
+  try {
+    // Validate individual fields to get specific error messages
+    await loginFormRef.value.validateField('username');
+    await loginFormRef.value.validateField('password');
+    await loginFormRef.value.validateField('captcha');
+    
+    // If no errors thrown, validate the entire form
+    const valid = await loginFormRef.value.validate();
+    
+    if (!valid) {
+      console.log('Form validation failed');
+      return; // If form validation fails, don't proceed
     }
-  })
-}
+    
+    // Form validation passed, continue login flow
+    loading.value = true;
+    
+    // Show Logo animation
+    const logoElement = document.querySelector('.logo-animation');
+    if (logoElement) logoElement.classList.add('pulse');
+    
+    try {
+      // Call login API with captcha
+      const response = await authApi.login(
+        loginForm.username, 
+        loginForm.password,
+        loginForm.captcha,
+        captchaUuid.value
+      );
+      console.log('Login API call succeeded with response:', response);
+      
+      // Update authentication state
+      authStore.login({
+        username: loginForm.username,
+        token: response.token,
+        user: response.user,
+        rememberMe: loginForm.rememberMe
+      });
+      
+      // Show success message
+      ElMessage.success('Login successful');
+      
+      // Navigate to chat page
+      router.push('/chat').catch(err => {
+        console.error('Navigation error:', err);
+      });
+    } catch (error: any) {
+      console.error('Login API failed:', error);
+      
+      // Show error message but don't refresh page
+      let errorMsg = 'Invalid credentials';
+      if (error.response && error.response.data && error.response.data.message) {
+        errorMsg = error.response.data.message;
+      } else if (error instanceof Error) {
+        errorMsg = error.message;
+      }
+      
+      ElMessage.error({
+        message: 'Login failed: ' + errorMsg,
+        duration: 5000 // Extended error display time
+      });
+      
+      // Refresh captcha after failed login
+      refreshCaptcha();
+      
+      // Remove Logo animation
+      if (logoElement) logoElement.classList.remove('pulse');
+    } finally {
+      loading.value = false;
+    }
+  } catch (validationError: any) {
+    console.error('Validation threw an error:', validationError);
+    
+    // Extract specific error message from validation error and display
+    let errorMessage = 'Please correct the form errors';
+    if (validationError && validationError.password && validationError.password.length > 0) {
+      errorMessage = validationError.password[0].message || errorMessage;
+    } else if (validationError && validationError.username && validationError.username.length > 0) {
+      errorMessage = validationError.username[0].message || errorMessage;
+    } else if (validationError && validationError.captcha && validationError.captcha.length > 0) {
+      errorMessage = validationError.captcha[0].message || errorMessage;
+    }
+    
+    ElMessage.warning(errorMessage);
+  }
+};
 
-// Inside the script section
-// 添加新的方法
+// Navigation methods
 function redirectToChat() {
   router.push({ name: 'chat' })
 }
@@ -1040,5 +1164,52 @@ export default defineComponent({
 
 .action-bubble:active {
   transform: translateY(0);
+}
+
+// Captcha styles
+.captcha-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.captcha-input {
+  flex: 1;
+}
+
+.captcha-image {
+  height: 40px;
+  min-width: 100px;
+  background: #f5f7fa;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  overflow: hidden;
+  border: 1px solid #dcdfe6;
+  transition: all 0.3s;
+  
+  &:hover {
+    border-color: #409EFF;
+    box-shadow: 0 0 0 2px rgba(64, 158, 255, 0.2);
+  }
+  
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .captcha-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    color: #909399;
+    font-size: 20px;
+    animation: rotate 1.5s linear infinite;
+  }
 }
 </style> 

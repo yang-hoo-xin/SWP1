@@ -326,9 +326,9 @@
     <div class="app-footer">
       <div>© 2025 AI Assistant</div>
       <div class="footer-links">
-        <el-link type="info" :underline="false">Privacy</el-link>
-        <el-link type="info" :underline="false">Terms</el-link>
-        <el-link type="info" :underline="false">Contact</el-link>
+        <el-link type="info" underline="never">Privacy</el-link>
+        <el-link type="info" underline="never">Terms</el-link>
+        <el-link type="info" underline="never">Contact</el-link>
       </div>
     </div>
   </div>
