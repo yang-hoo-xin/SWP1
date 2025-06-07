@@ -25,6 +25,15 @@
       <div class="help-header">
         <h1>Help Center</h1>
         <p class="subtitle">Learn how to get the most out of your AI Assistant</p>
+        <div class="search-box">
+          <el-input
+            v-model="searchQuery"
+            placeholder="Search help topics..."
+            :suffix-icon="Search"
+            @keyup.enter="handleSearch"
+          >
+          </el-input>
+        </div>
       </div>
 
       <div class="help-section">
@@ -65,7 +74,7 @@
               
               <div class="help-contact">
                 <h4>Need more help?</h4>
-                <el-button type="primary">Contact Support</el-button>
+                <el-button type="primary" class="contact-btn">Contact Support</el-button>
               </div>
             </div>
           </el-col>
@@ -73,61 +82,91 @@
           <el-col :span="18">
             <div class="help-sections">
               <section id="getting-started" class="help-section-content">
-                <h2>Getting Started</h2>
+                <div class="section-header">
+                  <el-icon class="section-icon"><Guide /></el-icon>
+                  <h2>Getting Started</h2>
+                </div>
                 <div class="help-card">
                   <h3>Welcome to AI Assistant</h3>
                   <p>AI Assistant is a powerful tool that leverages DeepSeek's advanced AI models to provide intelligent responses, generate content, and assist with various tasks.</p>
                   
-                  <h4>Quick Start Guide</h4>
-                  <ol>
+                  <h4 class="card-subtitle">Quick Start Guide</h4>
+                  <ol class="numbered-list">
                     <li>
-                      <strong>Login</strong> - Access the system with your credentials
+                      <div class="list-number">1</div>
+                      <div class="list-content">
+                        <strong>Login</strong> - Access the system with your credentials
+                      </div>
                     </li>
                     <li>
-                      <strong>Start a conversation</strong> - Type your message in the input box and press Enter or click Send
+                      <div class="list-number">2</div>
+                      <div class="list-content">
+                        <strong>Start a conversation</strong> - Type your message in the input box and press Enter or click Send
+                      </div>
                     </li>
                     <li>
-                      <strong>Choose a model</strong> - Select the AI model that best fits your needs from the dropdown menu
+                      <div class="list-number">3</div>
+                      <div class="list-content">
+                        <strong>Choose a model</strong> - Select the AI model that best fits your needs from the dropdown menu
+                      </div>
                     </li>
                     <li>
-                      <strong>Customize settings</strong> - Adjust the interface and model parameters to your preferences
+                      <div class="list-number">4</div>
+                      <div class="list-content">
+                        <strong>Customize settings</strong> - Adjust the interface and model parameters to your preferences
+                      </div>
                     </li>
                   </ol>
                 </div>
                 
-                <div class="help-card">
+                <div class="help-card video-card">
                   <h3>Video Tutorial</h3>
                   <div class="video-placeholder">
-                    <el-icon size="48"><VideoPlay /></el-icon>
+                    <div class="play-button">
+                      <el-icon size="48"><VideoPlay /></el-icon>
+                    </div>
                     <span>Watch the tutorial</span>
                   </div>
                 </div>
               </section>
               
               <section id="features" class="help-section-content">
-                <h2>Features</h2>
+                <div class="section-header">
+                  <el-icon class="section-icon"><Star /></el-icon>
+                  <h2>Features</h2>
+                </div>
                 <div class="help-card">
                   <h3>Key Capabilities</h3>
-                  <el-descriptions border :column="1">
-                    <el-descriptions-item label="Conversation Management">
-                      Create, save, and manage multiple conversations
-                    </el-descriptions-item>
-                    <el-descriptions-item label="Model Selection">
-                      Choose from different DeepSeek models optimized for various tasks
-                    </el-descriptions-item>
-                    <el-descriptions-item label="Deep Thinking Mode">
-                      Activate more thorough analysis for complex questions
-                    </el-descriptions-item>
-                    <el-descriptions-item label="Customizable UI">
-                      Adjust interface settings including dark mode and font size
-                    </el-descriptions-item>
-                    <el-descriptions-item label="Code Highlighting">
-                      Automatic syntax highlighting for code snippets
-                    </el-descriptions-item>
-                    <el-descriptions-item label="Copy Functionality">
-                      Easily copy AI responses to clipboard
-                    </el-descriptions-item>
-                  </el-descriptions>
+                  <div class="feature-tiles">
+                    <div class="feature-tile">
+                      <div class="feature-icon">
+                        <el-icon><ChatLineRound /></el-icon>
+                      </div>
+                      <h4>Conversation Management</h4>
+                      <p>Create, save, and manage multiple conversations</p>
+                    </div>
+                    <div class="feature-tile">
+                      <div class="feature-icon">
+                        <el-icon><Connection /></el-icon>
+                      </div>
+                      <h4>Model Selection</h4>
+                      <p>Choose from different DeepSeek models for various tasks</p>
+                    </div>
+                    <div class="feature-tile">
+                      <div class="feature-icon">
+                        <el-icon><View /></el-icon>
+                      </div>
+                      <h4>Deep Thinking Mode</h4>
+                      <p>Activate more thorough analysis for complex questions</p>
+                    </div>
+                    <div class="feature-tile">
+                      <div class="feature-icon">
+                        <el-icon><Setting /></el-icon>
+                      </div>
+                      <h4>Customizable UI</h4>
+                      <p>Adjust interface including dark mode and font size</p>
+                    </div>
+                  </div>
                 </div>
               </section>
               
@@ -480,14 +519,16 @@ export default defineComponent({
     margin-bottom: 40px;
     
     h1 {
-      font-size: 36px;
+      font-size: 42px;
       font-weight: 700;
-      color: #4b6cb7;
+      background: linear-gradient(135deg, #4b6cb7 0%, #182848 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
       margin-bottom: 16px;
     }
     
     .subtitle {
-      font-size: 18px;
+      font-size: 20px;
       color: #6c757d;
       max-width: 600px;
       margin: 0 auto 30px;
@@ -499,8 +540,15 @@ export default defineComponent({
       
       :deep(.el-input__wrapper) {
         border-radius: 50px;
-        padding-left: 20px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        padding-left: 8px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        height: 50px;
+        transition: all 0.3s ease;
+      }
+      
+      :deep(.el-input__wrapper:hover),
+      :deep(.el-input__wrapper:focus-within) {
+        box-shadow: 0 5px 25px rgba(0, 0, 0, 0.12);
       }
     }
   }
@@ -591,40 +639,35 @@ export default defineComponent({
 // Help card styling
 .help-card {
   background: white;
-  border-radius: 12px;
-  padding: 24px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  margin-bottom: 20px;
+  border-radius: 16px;
+  padding: 30px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  margin-bottom: 24px;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+  }
   
   h3 {
-    font-size: 20px;
+    font-size: 22px;
     font-weight: 600;
     color: #333;
     margin-bottom: 16px;
   }
   
-  p, li {
+  .card-subtitle {
+    font-size: 18px;
+    font-weight: 600;
+    color: #4b6cb7;
+    margin: 24px 0 16px;
+  }
+  
+  p {
     color: #555;
     line-height: 1.6;
-  }
-  
-  ul, ol {
-    padding-left: 20px;
-    margin-bottom: 16px;
-  }
-  
-  .tips {
-    background: rgba(75, 108, 183, 0.1);
-    padding: 16px;
-    border-radius: 8px;
-    margin-top: 16px;
-    
-    h4 {
-      font-size: 16px;
-      font-weight: 600;
-      color: #4b6cb7;
-      margin-bottom: 10px;
-    }
+    font-size: 16px;
   }
 }
 
@@ -733,23 +776,64 @@ export default defineComponent({
 .help-navigation {
   position: sticky;
   top: 20px;
-  padding: 20px 0;
+  padding: 20px;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  
+  h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 16px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+  }
 }
 
 .help-menu {
   border-right: none;
+  
+  :deep(.el-menu-item) {
+    height: 40px;
+    line-height: 40px;
+    border-radius: 8px;
+    margin-bottom: 4px;
+  }
+  
+  :deep(.el-menu-item.is-active) {
+    background-color: rgba(75, 108, 183, 0.1);
+    color: #4b6cb7;
+  }
 }
 
 .help-contact {
-  margin-top: 40px;
+  margin-top: 30px;
   padding: 20px;
-  background-color: var(--el-fill-color-light);
-  border-radius: 8px;
+  background: linear-gradient(135deg, rgba(75, 108, 183, 0.1) 0%, rgba(75, 108, 183, 0.2) 100%);
+  border-radius: 12px;
   text-align: center;
-}
-
-.help-contact h4 {
-  margin-bottom: 16px;
+  
+  h4 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 12px;
+  }
+  
+  .contact-btn {
+    width: 100%;
+    border-radius: 8px;
+    height: 40px;
+    background: linear-gradient(135deg, #4b6cb7 0%, #182848 100%);
+    border: none;
+    transition: all 0.3s ease;
+    
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(75, 108, 183, 0.3);
+    }
+  }
 }
 
 .help-sections {
@@ -847,5 +931,157 @@ export default defineComponent({
 
 .feature-callout p {
   margin: 0;
+}
+
+// Section headers
+.section-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 24px;
+  
+  .section-icon {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #4b6cb7 0%, #182848 100%);
+    color: white;
+    border-radius: 12px;
+    font-size: 20px;
+    margin-right: 16px;
+  }
+  
+  h2 {
+    font-size: 28px;
+    font-weight: 700;
+    color: #333;
+    margin: 0;
+  }
+}
+
+// Numbered list styling
+.numbered-list {
+  list-style: none;
+  padding: 0;
+  margin: 24px 0;
+  
+  li {
+    display: flex;
+    margin-bottom: 16px;
+    
+    .list-number {
+      width: 28px;
+      height: 28px;
+      background: linear-gradient(135deg, #4b6cb7 0%, #182848 100%);
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      margin-right: 16px;
+      flex-shrink: 0;
+    }
+    
+    .list-content {
+      padding-top: 4px;
+    }
+  }
+}
+
+// Video card styling
+.video-card {
+  .video-placeholder {
+    height: 240px;
+    background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ed 100%);
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    overflow: hidden;
+    position: relative;
+    
+    &:hover {
+      .play-button {
+        transform: scale(1.1);
+      }
+    }
+    
+    .play-button {
+      width: 80px;
+      height: 80px;
+      background: linear-gradient(135deg, #4b6cb7 0%, #182848 100%);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      margin-bottom: 16px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+      transition: all 0.3s ease;
+    }
+    
+    span {
+      font-size: 16px;
+      color: #4b6cb7;
+      font-weight: 500;
+    }
+  }
+}
+
+// Feature tiles
+.feature-tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 20px;
+  margin-top: 24px;
+  
+  .feature-tile {
+    background: rgba(245, 247, 250, 0.7);
+    border-radius: 12px;
+    padding: 24px;
+    text-align: center;
+    transition: all 0.3s ease;
+    
+    &:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+      background: white;
+      
+      .feature-icon {
+        transform: scale(1.1);
+      }
+    }
+    
+    .feature-icon {
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(135deg, rgba(75, 108, 183, 0.1) 0%, rgba(75, 108, 183, 0.2) 100%);
+      color: #4b6cb7;
+      font-size: 24px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 16px;
+      transition: all 0.3s ease;
+    }
+    
+    h4 {
+      font-size: 18px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 12px;
+    }
+    
+    p {
+      font-size: 14px;
+      color: #666;
+      margin: 0;
+    }
+  }
 }
 </style> 
