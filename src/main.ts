@@ -8,6 +8,7 @@ import { createPinia } from 'pinia'
 import ElementPlus from 'element-plus'
 import en from 'element-plus/dist/locale/en.mjs'
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
+// Particles.js already loaded in individual components where needed
 
 import App from './App.vue'
 import router from './router'
