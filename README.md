@@ -1,2 +1,1 @@
-# SWP1
-for sw project
+# Open-source Software 
