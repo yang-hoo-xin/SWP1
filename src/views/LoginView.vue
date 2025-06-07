@@ -51,11 +51,28 @@
               </span>
             </div>
             <h1 class="animated-text">AI Assistant</h1>
-            <p>Your intelligent conversation partner</p>
+            <p>您的智能对话伙伴</p>
             <div class="shine-line"></div>
           </div>
           
-          <el-form :model="loginForm" :rules="loginRules" ref="loginFormRef" class="login-form">
+          <div v-if="authStore.isAuthenticated" class="quick-actions">
+            <div class="action-bubbles">
+              <div class="action-bubble new-chat" @click="redirectToChat">
+                <el-icon><Plus /></el-icon>
+                <span>新建聊天</span>
+              </div>
+              <div class="action-bubble continue-chat" @click="redirectToChat">
+                <el-icon><ChatLineRound /></el-icon>
+                <span>继续对话</span>
+              </div>
+              <div class="action-bubble settings" @click="redirectToChatWithSettings">
+                <el-icon><Setting /></el-icon>
+                <span>个性化设置</span>
+              </div>
+            </div>
+          </div>
+          
+          <el-form v-else :model="loginForm" :rules="loginRules" ref="loginFormRef" class="login-form">
             <div class="form-item-animated">
               <el-form-item prop="username">
                 <el-input 
@@ -281,6 +298,16 @@ const handleLogin = async () => {
       }
     }
   })
+}
+
+// Inside the script section
+// 添加新的方法
+function redirectToChat() {
+  router.push({ name: 'chat' })
+}
+
+function redirectToChatWithSettings() {
+  router.push({ name: 'chat', query: { showSettings: 'true' } })
 }
 </script>
 
@@ -952,5 +979,79 @@ export default defineComponent({
     transform: scale(1);
     box-shadow: 0 0 0 0 rgba(75, 108, 183, 0);
   }
+}
+
+// Quick actions styling
+.quick-actions {
+  width: 100%;
+  padding: 20px 0;
+  animation: fadeIn 0.8s ease forwards;
+}
+
+.action-bubbles {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+
+.action-bubble {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  border-radius: 20px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  position: relative;
+  overflow: hidden;
+}
+
+.action-bubble::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0));
+  border-radius: inherit;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.action-bubble:hover::after {
+  opacity: 1;
+}
+
+.action-bubble .el-icon {
+  font-size: 24px;
+}
+
+.new-chat {
+  background-color: #95ec69;
+  color: #131313;
+}
+
+.continue-chat {
+  background-color: #64c4ed;
+  color: white;
+}
+
+.settings {
+  background-color: #f5f7fa;
+  color: #606266;
+}
+
+.action-bubble:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+}
+
+.action-bubble:active {
+  transform: translateY(0);
 }
 </style> 

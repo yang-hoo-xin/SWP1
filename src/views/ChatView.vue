@@ -49,19 +49,25 @@
       </div>
 
       <div class="sidebar-footer">
-        <el-tooltip content="Settings" placement="right" :disabled="!sidebarCollapsed">
-          <el-button class="footer-btn" @click="showSettings = true">
-            <el-icon><Setting /></el-icon>
-            <span v-if="!sidebarCollapsed">Settings</span>
-          </el-button>
-        </el-tooltip>
-        
-        <el-tooltip content="Logout" placement="right" :disabled="!sidebarCollapsed">
-          <el-button class="footer-btn" @click="handleLogout">
-            <el-icon><SwitchButton /></el-icon>
-            <span v-if="!sidebarCollapsed">Logout</span>
-          </el-button>
-        </el-tooltip>
+        <div class="footer-buttons">
+          <el-tooltip content="Settings" placement="right" :disabled="!sidebarCollapsed">
+            <el-button class="footer-btn" @click="showSettings = true">
+              <div class="btn-icon-wrapper">
+                <el-icon class="footer-icon"><Setting /></el-icon>
+              </div>
+              <span v-if="!sidebarCollapsed" class="btn-text">Settings</span>
+            </el-button>
+          </el-tooltip>
+          
+          <el-tooltip content="Logout" placement="right" :disabled="!sidebarCollapsed">
+            <el-button class="footer-btn" @click="handleLogout">
+              <div class="btn-icon-wrapper">
+                <el-icon class="footer-icon"><SwitchButton /></el-icon>
+              </div>
+              <span v-if="!sidebarCollapsed" class="btn-text">Logout</span>
+            </el-button>
+          </el-tooltip>
+        </div>
       </div>
     </div>
 
@@ -73,17 +79,28 @@
           <h2>{{ currentConversation?.title || 'New Conversation' }}</h2>
           <div class="model-selector">
             <span class="model-label">Model:</span>
-            <el-select v-model="selectedModel" size="small" @change="handleModelChange">
-              <el-option v-for="model in availableModels" :key="model.id" :label="model.name" :value="model.id">
-                <div class="model-option">
+            <div class="model-dropdown">
+              <div class="selected-model" @click="showModelDropdown = !showModelDropdown">
+                <img :src="selectedModelDetails.avatar" class="model-avatar" alt="Model Avatar" />
+                <div class="model-name">{{ selectedModelDetails.name }}</div>
+                <el-icon class="dropdown-arrow"><ArrowDown /></el-icon>
+              </div>
+              <div class="model-options" v-if="showModelDropdown">
+                <div 
+                  v-for="model in availableModels" 
+                  :key="model.id" 
+                  class="model-option" 
+                  :class="{ 'active': selectedModel === model.id }"
+                  @click="selectModelAndClose(model.id)"
+                >
                   <img :src="model.avatar" class="model-avatar" alt="Model Avatar" />
                   <div class="model-details">
                     <div class="model-name">{{ model.name }}</div>
                     <div class="model-description">{{ model.description }}</div>
                   </div>
                 </div>
-              </el-option>
-            </el-select>
+              </div>
+            </div>
           </div>
         </div>
         
@@ -92,7 +109,7 @@
             type="primary" 
             :class="{'active': deepThinkingMode}"
             @click="toggleDeepThinking">
-            <el-icon><View /></el-icon>
+            <el-icon><Lightbulb /></el-icon>
             <span>Deep Thinking {{ deepThinkingMode ? 'ON' : 'OFF' }}</span>
           </el-button>
           
@@ -107,9 +124,32 @@
       <div class="chat-messages" ref="messagesContainer">
         <div v-if="currentConversation?.messages.length === 0" class="empty-chat">
           <div class="empty-chat-content">
-            <el-icon size="48"><ChatDotSquare /></el-icon>
-            <h3>Start a new conversation</h3>
-            <p>Ask me anything, and I'll do my best to assist you.</p>
+            <div class="welcome-avatar">
+              <img :src="selectedModelDetails.avatar" alt="AI" />
+            </div>
+            <h3>Welcome to {{ selectedModelDetails.name }}</h3>
+            <p>How can I assist you today?</p>
+            
+            <div class="suggestion-bubbles">
+              <div class="suggestion-bubble" @click="applyTemplate('intro')">
+                <span>👋 Introduce yourself</span>
+              </div>
+              <div class="suggestion-bubble" @click="applyTemplate('help')">
+                <span>💡 What can you do?</span>
+              </div>
+              <div class="suggestion-bubble" @click="applyTemplate('code')">
+                <span>💻 Write some code</span>
+              </div>
+              <div class="suggestion-bubble" @click="applyTemplate('creative')">
+                <span>✨ Creative ideas</span>
+              </div>
+              <div class="suggestion-bubble" @click="applyTemplate('translate')">
+                <span>🌐 Translate text</span>
+              </div>
+              <div class="suggestion-bubble" @click="applyTemplate('analyze')">
+                <span>📊 Data analysis</span>
+              </div>
+            </div>
           </div>
         </div>
         
@@ -124,7 +164,7 @@
               <img :src="message.role === 'user' ? userAvatar : selectedModelDetails.avatar" :alt="message.role" />
             </div>
             
-            <div class="message-content">
+            <div class="message-content" :class="{ 'user-bubble': message.role === 'user', 'ai-bubble': message.role === 'assistant' }">
               <div class="message-header">
                 <span class="message-author">{{ message.role === 'user' ? 'You' : selectedModelDetails.name }}</span>
                 <span class="message-time">{{ formatTime(message.timestamp) }}</span>
@@ -133,10 +173,10 @@
               <div class="message-body" v-html="formatMessage(message.content)"></div>
               
               <div class="message-actions" v-if="message.role === 'assistant'">
-                <el-button size="small" text @click="copyMessage(message.content)">
+                <el-button size="small" text @click="copyMessage(message.content)" class="action-btn">
                   <el-icon><CopyDocument /></el-icon>
                 </el-button>
-                <el-button size="small" text v-if="index === currentConversation?.messages.length - 1 && message.role === 'assistant'">
+                <el-button size="small" text v-if="index === currentConversation?.messages.length - 1 && message.role === 'assistant'" class="action-btn">
                   <el-icon><RefreshLeft /></el-icon>
                 </el-button>
               </div>
@@ -163,35 +203,41 @@
 
       <!-- Input Area -->
       <div class="chat-input-container">
-        <div class="input-buttons">
-          <el-tooltip content="Upload File" placement="top">
-            <el-button circle>
-              <el-icon><Upload /></el-icon>
-            </el-button>
-          </el-tooltip>
-        </div>
-        
-        <div class="input-area">
+        <div class="input-wrapper">
           <el-input
             v-model="userInput"
             type="textarea"
-            :rows="2"
+            :rows="1"
             resize="none"
             placeholder="Type your message here..."
             @keydown.enter.prevent="sendMessage"
+            class="message-input"
           />
-        </div>
-        
-        <div class="send-button">
-          <el-button 
-            type="primary" 
-            :loading="isStreaming" 
-            :disabled="!userInput.trim()" 
-            @click="sendMessage"
-          >
-            <el-icon><Position /></el-icon>
-            Send
-          </el-button>
+          
+          <div class="input-actions">
+            <el-tooltip content="Upload File" placement="top">
+              <el-button class="action-icon-btn">
+                <el-icon><Upload /></el-icon>
+              </el-button>
+            </el-tooltip>
+            
+            <el-tooltip content="Insert Image" placement="top">
+              <el-button class="action-icon-btn">
+                <el-icon><Picture /></el-icon>
+              </el-button>
+            </el-tooltip>
+            
+            <el-button 
+              type="primary" 
+              circle
+              :loading="isStreaming" 
+              :disabled="!userInput.trim()" 
+              @click="sendMessage"
+              class="send-btn"
+            >
+              <el-icon><Position /></el-icon>
+            </el-button>
+          </div>
         </div>
       </div>
     </div>
@@ -286,6 +332,7 @@ const authStore = useAuthStore()
 // UI State
 const sidebarCollapsed = ref(false)
 const showSettings = ref(false)
+const showModelDropdown = ref(false)
 const messagesContainer = ref<HTMLElement | null>(null)
 
 // Chat state
@@ -567,6 +614,42 @@ function handleLogout() {
   router.push({ name: 'login' })
 }
 
+function selectModelAndClose(modelId: string) {
+  selectedModel.value = modelId
+  showModelDropdown.value = false
+  handleModelChange()
+}
+
+// Apply suggestion template
+function applyTemplate(type: string) {
+  let prompt = '';
+  
+  switch(type) {
+    case 'intro':
+      prompt = 'Please introduce yourself. What are your capabilities and features?';
+      break;
+    case 'help':
+      prompt = 'What can you help me with? What are some common use cases?';
+      break;
+    case 'code':
+      prompt = 'Please write a simple TodoList application using JavaScript';
+      break;
+    case 'creative':
+      prompt = 'Give me some creative ideas for a new product';
+      break;
+    case 'translate':
+      prompt = 'Please translate this text to Spanish: Artificial intelligence is changing the way we live';
+      break;
+    case 'analyze':
+      prompt = 'How can I use AI to analyze and visualize large datasets?';
+      break;
+    default:
+      prompt = 'Hello, can you help me with some questions?';
+  }
+  
+  userInput.value = prompt;
+}
+
 // Watchers
 watch(() => uiSettings.darkMode, (newValue) => {
   document.documentElement.classList.toggle('dark-theme', newValue)
@@ -574,6 +657,13 @@ watch(() => uiSettings.darkMode, (newValue) => {
 
 // Lifecycle hooks
 onMounted(() => {
+  document.addEventListener('click', (event) => {
+    const target = event.target as HTMLElement
+    if (!target.closest('.model-dropdown') && showModelDropdown.value) {
+      showModelDropdown.value = false
+    }
+  })
+  
   scrollToBottom()
   
   // Apply initial settings
@@ -581,6 +671,12 @@ onMounted(() => {
   document.documentElement.style.setProperty('--primary-color', uiSettings.primaryColor)
   document.documentElement.style.setProperty('--font-size', `${uiSettings.fontSize}px`)
   document.documentElement.style.setProperty('--message-spacing', `${uiSettings.messageSpacing}rem`)
+  
+  // Check if showSettings query parameter is present
+  const route = router.currentRoute.value
+  if (route.query.showSettings === 'true') {
+    showSettings.value = true
+  }
 })
 </script>
 
@@ -687,17 +783,70 @@ onMounted(() => {
 .sidebar-footer {
   padding: 16px;
   border-top: 1px solid var(--el-border-color-light);
+  background-color: var(--el-bg-color-page);
+}
+
+.footer-buttons {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 12px;
 }
 
 .footer-btn {
   display: flex;
   align-items: center;
-  gap: 8px;
   width: 100%;
   justify-content: flex-start;
+  padding: 0;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  background-color: var(--el-fill-color-light);
+  color: var(--el-text-color-primary);
+  font-weight: 500;
+  border: none;
+  height: 48px;
+  margin: 0;
+  overflow: hidden;
+}
+
+.footer-btn:hover {
+  background-color: var(--el-color-primary-light-9);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.footer-btn:active {
+  transform: translateY(0);
+}
+
+.btn-icon-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 48px;
+  width: 48px;
+  flex-shrink: 0;
+}
+
+.footer-icon {
+  font-size: 18px;
+  color: var(--el-color-primary);
+}
+
+.btn-text {
+  font-size: 14px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  padding-left: 4px;
+}
+
+.dark-mode .footer-btn {
+  background-color: #2c2c2c;
+}
+
+.dark-mode .footer-btn:hover {
+  background-color: #363636;
 }
 
 /* Main Chat Area */
@@ -742,15 +891,59 @@ onMounted(() => {
   color: var(--el-text-color-secondary);
 }
 
+.model-dropdown {
+  position: relative;
+  cursor: pointer;
+  user-select: none;
+}
+
+.selected-model {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  background-color: var(--el-fill-color-light);
+  transition: background-color 0.2s;
+}
+
+.selected-model:hover {
+  background-color: var(--el-fill-color);
+}
+
+.dropdown-arrow {
+  font-size: 12px;
+  color: var(--el-text-color-secondary);
+}
+
+.model-options {
+  position: absolute;
+  top: calc(100% + 5px);
+  left: 0;
+  right: 0;
+  background-color: var(--el-bg-color);
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 100;
+  overflow: hidden;
+  width: 280px;
+}
+
 .model-option {
   display: flex;
   align-items: center;
   gap: 10px;
+  padding: 12px 15px;
+  transition: background-color 0.2s;
+}
+
+.model-option:hover, .model-option.active {
+  background-color: var(--el-fill-color-light);
 }
 
 .model-avatar {
-  width: 24px;
-  height: 24px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   object-fit: cover;
 }
@@ -762,6 +955,7 @@ onMounted(() => {
 
 .model-name {
   font-weight: 500;
+  font-size: 14px;
 }
 
 .model-description {
@@ -798,11 +992,110 @@ onMounted(() => {
 
 .empty-chat-content {
   text-align: center;
-  max-width: 400px;
+  max-width: 600px;
+  animation: fadeIn 0.5s ease;
+}
+
+.welcome-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  margin: 0 auto 16px;
+  padding: 5px;
+  background: linear-gradient(135deg, var(--el-color-primary-light-5), var(--el-color-primary));
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  animation: pulse 2s infinite;
+}
+
+.welcome-avatar img {
+  width: 90%;
+  height: 90%;
+  border-radius: 50%;
+  object-fit: cover;
+  background-color: white;
 }
 
 .empty-chat-content h3 {
   margin: 16px 0 8px;
+  font-size: 24px;
+  color: var(--el-text-color-primary);
+}
+
+.empty-chat-content p {
+  font-size: 16px;
+  margin-bottom: 30px;
+}
+
+.suggestion-bubbles {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.suggestion-bubble {
+  background-color: #f5f7fa;
+  border-radius: 20px;
+  padding: 10px 18px;
+  font-size: 14px;
+  color: #606266;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  animation: fadeInUp 0.5s ease both;
+  border: 1px solid #e4e7ed;
+}
+
+.suggestion-bubble:nth-child(1) { animation-delay: 0.1s; }
+.suggestion-bubble:nth-child(2) { animation-delay: 0.2s; }
+.suggestion-bubble:nth-child(3) { animation-delay: 0.3s; }
+.suggestion-bubble:nth-child(4) { animation-delay: 0.4s; }
+.suggestion-bubble:nth-child(5) { animation-delay: 0.5s; }
+.suggestion-bubble:nth-child(6) { animation-delay: 0.6s; }
+
+.suggestion-bubble:hover {
+  background-color: #ecf5ff;
+  color: var(--el-color-primary);
+  transform: translateY(-3px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.dark-mode .suggestion-bubble {
+  background-color: #2c2c2c;
+  color: #dcdfe6;
+  border-color: #434343;
+}
+
+.dark-mode .suggestion-bubble:hover {
+  background-color: #363636;
+  color: var(--el-color-primary);
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 
 .message-container {
@@ -924,21 +1217,115 @@ onMounted(() => {
 
 /* Chat Input */
 .chat-input-container {
-  padding: 16px;
+  padding: 16px 20px;
   border-top: 1px solid var(--el-border-color-light);
-  display: flex;
-  align-items: flex-end;
-  gap: 12px;
   background-color: var(--el-bg-color);
+  position: relative;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
 }
 
-.input-buttons {
+.input-wrapper {
+  position: relative;
   display: flex;
-  gap: 8px;
+  flex-direction: column;
+  border-radius: 18px;
+  border: 1px solid #e4e7ed;
+  background-color: #fff;
+  padding: 10px 15px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
 }
 
-.input-area {
+.message-input {
   flex: 1;
+}
+
+.message-input :deep(.el-textarea__inner) {
+  border: none;
+  padding: 8px 0;
+  resize: none;
+  line-height: 1.5;
+  box-shadow: none;
+  background: transparent;
+  min-height: 24px !important;
+}
+
+.message-input :deep(.el-textarea__inner:focus) {
+  box-shadow: none;
+}
+
+.input-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 6px;
+  border-top: 1px solid #f0f0f0;
+  padding-top: 8px;
+}
+
+.action-icon-btn {
+  border: none;
+  background: transparent;
+  padding: 6px;
+  border-radius: 50%;
+  color: #909399;
+}
+
+.action-icon-btn:hover {
+  background-color: #f5f7fa;
+  color: #409EFF;
+}
+
+.action-icon-btn .el-icon {
+  font-size: 18px;
+}
+
+.send-btn {
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, #95ec69, #5ad025);
+  border: none;
+  box-shadow: 0 4px 12px rgba(90, 208, 37, 0.3);
+  transition: all 0.3s ease;
+}
+
+.send-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(90, 208, 37, 0.4);
+}
+
+.send-btn:active {
+  transform: translateY(0);
+}
+
+.send-btn .el-icon {
+  font-size: 18px;
+}
+
+.dark-mode .input-wrapper {
+  background-color: #2c2c2c;
+  border-color: #444;
+}
+
+.dark-mode .input-actions {
+  border-top-color: #444;
+}
+
+.dark-mode .message-input :deep(.el-textarea__inner) {
+  background-color: transparent;
+  color: #eee;
+}
+
+.dark-mode .action-icon-btn {
+  color: #aaa;
+}
+
+.dark-mode .action-icon-btn:hover {
+  background-color: #3c3c3c;
+}
+
+.dark-mode .send-btn {
+  background: linear-gradient(135deg, #7fd750, #4ea320);
 }
 
 /* Dark Mode Specific Styles */
@@ -962,5 +1349,43 @@ onMounted(() => {
 @keyframes blink {
   0%, 100% { opacity: 0.2; }
   50% { opacity: 1; }
+}
+
+/* Message bubbles styling */
+.user-bubble {
+  background-color: #95ec69 !important;
+  border-radius: 18px 4px 18px 18px !important;
+  color: #000 !important;
+}
+
+.ai-bubble {
+  background-color: #ffffff !important;
+  border-radius: 4px 18px 18px 18px !important;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08) !important;
+}
+
+.user-message .message-time, 
+.user-message .message-author {
+  color: rgba(0, 0, 0, 0.6) !important;
+}
+
+.message-actions {
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.message-content:hover .message-actions {
+  opacity: 1;
+}
+
+.action-btn {
+  color: var(--el-text-color-secondary);
+  padding: 4px !important;
+  height: 24px !important;
+}
+
+.action-btn:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+  color: var(--el-color-primary);
 }
 </style> 
