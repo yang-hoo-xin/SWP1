@@ -145,7 +145,7 @@
 
           <div class="form-item-animated" style="animation-delay: 0.4s;">
             <div class="login-footer">
-              <p>Don't have an account? <el-link type="primary" underline="never" class="hover-effect">Sign up</el-link></p>
+              <p>Don't have an account? <el-link type="primary" @click="$router.push('/signup')" underline="never" class="hover-effect">Sign up</el-link></p>
             </div>
           </div>
         </div>

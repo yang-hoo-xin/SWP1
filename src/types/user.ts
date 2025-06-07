@@ -24,7 +24,9 @@ export interface UserInfo {
 export interface LoginParams {
   username: string;
   password: string;
-  rememberMe?: boolean;
+  captcha: string;
+  captchaUuid: string;
+  remember?: boolean;
 }
 
 /**
@@ -37,6 +39,7 @@ export interface RegisterParams {
   email: string;
   captcha: string;
   captchaUuid: string;
+  emailCode?: string;
   agreeTerms: boolean;
 }
 

@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import LoginView from '../views/LoginView.vue'
+import SignupView from '../views/SignupView.vue'
 import { useAuthStore } from '../stores/auth'
 
 const router = createRouter({
@@ -13,6 +14,12 @@ const router = createRouter({
       path: '/login',
       name: 'login',
       component: LoginView,
+      meta: { requiresAuth: false }
+    },
+    {
+      path: '/signup',
+      name: 'signup',
+      component: SignupView,
       meta: { requiresAuth: false }
     },
     {

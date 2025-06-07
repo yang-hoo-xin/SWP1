@@ -126,7 +126,8 @@ export const authApi = {
         password: registerParams.password,
         email: registerParams.email,
         captcha: registerParams.captcha,
-        captchaUuid: registerParams.captchaUuid
+        captchaUuid: registerParams.captchaUuid,
+        emailCode: registerParams.emailCode
       });
       
       console.log('Registration response:', response);
@@ -174,5 +175,58 @@ export const authApi = {
    */
   isAuthenticated: (): boolean => {
     return !!localStorage.getItem('token');
-  }
+  },
+
+  /**
+   * Send email verification code
+   * @param email Email address to send verification code to
+   * @returns Promise containing success result
+   */
+  sendEmailCode: async (email: string): Promise<{success: boolean, message: string}> => {
+    try {
+      console.log('Sending verification code to email:', email);
+      
+      const response = await apiClient.post<unknown, ApiResponse<{success: boolean}>>('/api/auth/email/code', { 
+        email,
+        type: 'register' // 可以是 'register' 或 'reset' 取决于用途
+      });
+      
+      console.log('Email verification code response:', response);
+      
+      return { 
+        success: true,
+        message: 'Verification code sent successfully'
+      };
+    } catch (error: any) {
+      console.error('Failed to send verification code:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Verify email code
+   * @param email Email address
+   * @param code Verification code
+   * @returns Promise containing verification result
+   */
+  verifyEmailCode: async (email: string, code: string): Promise<{success: boolean, message: string}> => {
+    try {
+      console.log('Verifying email code:', { email, code });
+      
+      const response = await apiClient.post<unknown, ApiResponse<{success: boolean}>>('/api/auth/email/verify', { 
+        email,
+        code
+      });
+      
+      console.log('Email verification response:', response);
+      
+      return { 
+        success: true,
+        message: 'Email verified successfully'
+      };
+    } catch (error: any) {
+      console.error('Failed to verify email code:', error);
+      throw error;
+    }
+  },
 }; 
