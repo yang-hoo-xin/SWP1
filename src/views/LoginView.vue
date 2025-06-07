@@ -9,7 +9,7 @@
         <span>AI Assistant</span>
       </div>
       <div class="header-actions">
-        <el-button text>
+        <el-button text @click="$router.push('/help')">
           <el-icon><QuestionFilled /></el-icon>
           <span class="hidden-xs">Help</span>
         </el-button>
@@ -195,6 +195,12 @@ const loginForm = reactive({
   rememberMe: false
 })
 
+// 模拟用户数据库
+const mockUsers = [
+  { username: 'demo', password: 'password123', role: 'user' },
+  { username: 'admin', password: 'admin123', role: 'admin' }
+]
+
 // Form validation rules
 const loginRules = {
   username: [
@@ -243,19 +249,27 @@ const handleLogin = async () => {
         const logoElement = document.querySelector('.logo-animation');
         if (logoElement) logoElement.classList.add('pulse');
         
-        // For demo purposes, accept any username/password
-        // In a real app, you would call an API endpoint
-        await new Promise(resolve => setTimeout(resolve, 1500))
+        // 使用模拟数据登录逻辑
+        await new Promise(resolve => setTimeout(resolve, 1000))
         
-        // Store authentication info
-        authStore.login({
-          username: loginForm.username,
-          token: 'demo-token-' + Date.now(),
-          rememberMe: loginForm.rememberMe
-        })
+        // 验证用户名和密码
+        const user = mockUsers.find(
+          u => u.username === loginForm.username && u.password === loginForm.password
+        )
         
-        ElMessage.success('Login successful')
-        router.push('/chat')
+        if (user) {
+          // Store authentication info
+          authStore.login({
+            username: user.username,
+            token: 'mock-token-' + Date.now(),
+            rememberMe: loginForm.rememberMe
+          })
+          
+          ElMessage.success('Login successful')
+          router.push('/chat')
+        } else {
+          throw new Error('Invalid username or password')
+        }
       } catch (error) {
         ElMessage.error('Login failed: ' + (error instanceof Error ? error.message : 'Unknown error'))
         

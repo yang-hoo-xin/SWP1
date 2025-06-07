@@ -24,162 +24,262 @@
     <div class="help-content">
       <div class="help-header">
         <h1>Help Center</h1>
-        <p class="subtitle">Get started with AI Assistant and discover how to get the most out of it</p>
-        
-        <div class="search-box">
-          <el-input 
-            placeholder="Search for help topics..." 
-            prefix-icon="Search" 
-            size="large"
-            v-model="searchQuery"
-            @keyup.enter="handleSearch"
-          />
-        </div>
+        <p class="subtitle">Learn how to get the most out of your AI Assistant</p>
       </div>
-      
-      <!-- Quick Links -->
-      <div class="quick-links">
-        <div class="link-card" v-for="(link, index) in quickLinks" :key="index" @click="scrollToSection(link.target)">
-          <div class="link-icon">
-            <el-icon :size="24">
-              <component :is="link.icon" />
-            </el-icon>
-          </div>
-          <div class="link-text">
-            <h3>{{ link.title }}</h3>
-            <p>{{ link.description }}</p>
-          </div>
-        </div>
-      </div>
-      
-      <!-- Main Help Sections -->
-      <div class="help-sections">
-        <div class="help-section" id="getting-started">
-          <h2><el-icon><Guide /></el-icon> Getting Started</h2>
-          <div class="section-content">
-            <div class="help-card">
-              <h3>Creating Your Account</h3>
-              <p>To create a new account, visit the login page and click on "Sign up". Fill out the required information and verify your email address.</p>
-              <div class="tips">
-                <h4>Quick Tips:</h4>
-                <ul>
-                  <li>Use a strong, unique password</li>
-                  <li>Check your spam folder if you don't see the verification email</li>
-                  <li>You can use your Google or Microsoft account for faster sign-up</li>
-                </ul>
+
+      <div class="help-section">
+        <el-row :gutter="20">
+          <el-col :span="6">
+            <div class="help-navigation">
+              <h3>Topics</h3>
+              <el-menu
+                default-active="getting-started"
+                class="help-menu"
+                @select="scrollToSection"
+              >
+                <el-menu-item index="getting-started">
+                  <el-icon><Guide /></el-icon>
+                  <span>Getting Started</span>
+                </el-menu-item>
+                <el-menu-item index="features">
+                  <el-icon><Star /></el-icon>
+                  <span>Features</span>
+                </el-menu-item>
+                <el-menu-item index="models">
+                  <el-icon><Connection /></el-icon>
+                  <span>AI Models</span>
+                </el-menu-item>
+                <el-menu-item index="deep-thinking">
+                  <el-icon><View /></el-icon>
+                  <span>Deep Thinking Mode</span>
+                </el-menu-item>
+                <el-menu-item index="settings">
+                  <el-icon><Setting /></el-icon>
+                  <span>Customizing UI</span>
+                </el-menu-item>
+                <el-menu-item index="faq">
+                  <el-icon><QuestionFilled /></el-icon>
+                  <span>FAQ</span>
+                </el-menu-item>
+              </el-menu>
+              
+              <div class="help-contact">
+                <h4>Need more help?</h4>
+                <el-button type="primary">Contact Support</el-button>
               </div>
             </div>
-            
-            <div class="help-card">
-              <h3>Navigating the Interface</h3>
-              <p>Our intuitive interface is designed to make your experience as smooth as possible. The main sections include:</p>
-              <ul>
-                <li><strong>Chat:</strong> Where you interact with the AI Assistant</li>
-                <li><strong>History:</strong> Access your past conversations</li>
-                <li><strong>Settings:</strong> Customize your experience</li>
-                <li><strong>Profile:</strong> Manage your account details</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-        
-        <div class="help-section" id="using-ai">
-          <h2><el-icon><Cpu /></el-icon> Using the AI Assistant</h2>
-          <div class="section-content">
-            <div class="help-card">
-              <h3>Asking Questions</h3>
-              <p>You can ask our AI Assistant almost anything! Some examples of questions include:</p>
-              <ul>
-                <li>Factual questions about science, history, math, and more</li>
-                <li>Creative help with writing, brainstorming, or problem-solving</li>
-                <li>Programming help and code explanations</li>
-                <li>Language translations and grammar checking</li>
-              </ul>
-            </div>
-            
-            <div class="help-card">
-              <h3>Advanced Features</h3>
-              <p>Get the most out of your AI Assistant with these advanced features:</p>
-              <div class="feature-list">
-                <div class="feature">
-                  <div class="feature-icon"><el-icon><Document /></el-icon></div>
-                  <div class="feature-details">
-                    <h4>Document Analysis</h4>
-                    <p>Upload documents for the AI to analyze and summarize</p>
+          </el-col>
+          
+          <el-col :span="18">
+            <div class="help-sections">
+              <section id="getting-started" class="help-section-content">
+                <h2>Getting Started</h2>
+                <div class="help-card">
+                  <h3>Welcome to AI Assistant</h3>
+                  <p>AI Assistant is a powerful tool that leverages DeepSeek's advanced AI models to provide intelligent responses, generate content, and assist with various tasks.</p>
+                  
+                  <h4>Quick Start Guide</h4>
+                  <ol>
+                    <li>
+                      <strong>Login</strong> - Access the system with your credentials
+                    </li>
+                    <li>
+                      <strong>Start a conversation</strong> - Type your message in the input box and press Enter or click Send
+                    </li>
+                    <li>
+                      <strong>Choose a model</strong> - Select the AI model that best fits your needs from the dropdown menu
+                    </li>
+                    <li>
+                      <strong>Customize settings</strong> - Adjust the interface and model parameters to your preferences
+                    </li>
+                  </ol>
+                </div>
+                
+                <div class="help-card">
+                  <h3>Video Tutorial</h3>
+                  <div class="video-placeholder">
+                    <el-icon size="48"><VideoPlay /></el-icon>
+                    <span>Watch the tutorial</span>
                   </div>
                 </div>
-                <div class="feature">
-                  <div class="feature-icon"><el-icon><Picture /></el-icon></div>
-                  <div class="feature-details">
-                    <h4>Image Understanding</h4>
-                    <p>Share images for the AI to describe or analyze</p>
+              </section>
+              
+              <section id="features" class="help-section-content">
+                <h2>Features</h2>
+                <div class="help-card">
+                  <h3>Key Capabilities</h3>
+                  <el-descriptions border :column="1">
+                    <el-descriptions-item label="Conversation Management">
+                      Create, save, and manage multiple conversations
+                    </el-descriptions-item>
+                    <el-descriptions-item label="Model Selection">
+                      Choose from different DeepSeek models optimized for various tasks
+                    </el-descriptions-item>
+                    <el-descriptions-item label="Deep Thinking Mode">
+                      Activate more thorough analysis for complex questions
+                    </el-descriptions-item>
+                    <el-descriptions-item label="Customizable UI">
+                      Adjust interface settings including dark mode and font size
+                    </el-descriptions-item>
+                    <el-descriptions-item label="Code Highlighting">
+                      Automatic syntax highlighting for code snippets
+                    </el-descriptions-item>
+                    <el-descriptions-item label="Copy Functionality">
+                      Easily copy AI responses to clipboard
+                    </el-descriptions-item>
+                  </el-descriptions>
+                </div>
+              </section>
+              
+              <section id="models" class="help-section-content">
+                <h2>AI Models</h2>
+                <div class="help-card">
+                  <h3>Available Models</h3>
+                  <p>AI Assistant provides access to several specialized DeepSeek models:</p>
+                  
+                  <el-card class="model-card" shadow="hover">
+                    <template #header>
+                      <div class="model-header">
+                        <h4>DeepSeek Base</h4>
+                      </div>
+                    </template>
+                    <div class="model-content">
+                      <p><strong>Best for:</strong> General purpose tasks, answering questions, summarization</p>
+                      <p><strong>Description:</strong> A versatile model with broad knowledge and capabilities</p>
+                    </div>
+                  </el-card>
+                  
+                  <el-card class="model-card" shadow="hover">
+                    <template #header>
+                      <div class="model-header">
+                        <h4>DeepSeek Coder</h4>
+                      </div>
+                    </template>
+                    <div class="model-content">
+                      <p><strong>Best for:</strong> Programming assistance, code generation, debugging</p>
+                      <p><strong>Description:</strong> Specialized for software development across multiple programming languages</p>
+                    </div>
+                  </el-card>
+                  
+                  <el-card class="model-card" shadow="hover">
+                    <template #header>
+                      <div class="model-header">
+                        <h4>DeepSeek Chat</h4>
+                      </div>
+                    </template>
+                    <div class="model-content">
+                      <p><strong>Best for:</strong> Natural conversations, casual interactions</p>
+                      <p><strong>Description:</strong> Optimized for engaging and helpful dialogue</p>
+                    </div>
+                  </el-card>
+                </div>
+              </section>
+              
+              <section id="deep-thinking" class="help-section-content">
+                <h2>Deep Thinking Mode</h2>
+                <div class="help-card">
+                  <h3>How It Works</h3>
+                  <p>Deep Thinking Mode instructs the AI to spend more time analyzing your query from multiple perspectives before responding. This results in more thorough and comprehensive answers.</p>
+                  
+                  <h4>When to Use Deep Thinking Mode</h4>
+                  <ul>
+                    <li>For complex questions requiring nuanced analysis</li>
+                    <li>When you need detailed explanations of concepts</li>
+                    <li>For creative tasks where you want more thoughtful outputs</li>
+                    <li>When comparing multiple options or perspectives</li>
+                  </ul>
+                  
+                  <div class="feature-callout">
+                    <el-icon><InfoFilled /></el-icon>
+                    <p>Responses in Deep Thinking Mode may take slightly longer but provide more comprehensive information.</p>
                   </div>
                 </div>
-                <div class="feature">
-                  <div class="feature-icon"><el-icon><Microphone /></el-icon></div>
-                  <div class="feature-details">
-                    <h4>Voice Interaction</h4>
-                    <p>Speak to the AI naturally using your microphone</p>
-                  </div>
+              </section>
+              
+              <section id="settings" class="help-section-content">
+                <h2>Customizing UI</h2>
+                <div class="help-card">
+                  <h3>Personalization Options</h3>
+                  <p>AI Assistant offers numerous ways to customize your experience:</p>
+                  
+                  <h4>Appearance</h4>
+                  <ul>
+                    <li><strong>Dark Mode:</strong> Toggle between light and dark themes</li>
+                    <li><strong>Font Size:</strong> Adjust text size for better readability</li>
+                    <li><strong>Message Spacing:</strong> Control the density of messages</li>
+                    <li><strong>Primary Color:</strong> Change the main accent color</li>
+                  </ul>
+                  
+                  <h4>Model Preferences</h4>
+                  <ul>
+                    <li><strong>Default Model:</strong> Set your preferred AI model</li>
+                    <li><strong>Temperature:</strong> Control response creativity (higher values = more creative)</li>
+                    <li><strong>Max Tokens:</strong> Set the maximum length of responses</li>
+                  </ul>
+                  
+                  <h4>Advanced Settings</h4>
+                  <ul>
+                    <li><strong>Stream Responses:</strong> See responses appear in real-time</li>
+                    <li><strong>Code Syntax Highlighting:</strong> Enable/disable for code blocks</li>
+                    <li><strong>Save Chat History:</strong> Control whether conversations are saved</li>
+                  </ul>
                 </div>
-              </div>
+              </section>
+              
+              <section id="faq" class="help-section-content">
+                <h2>Frequently Asked Questions</h2>
+                <div class="help-card">
+                  <el-collapse accordion>
+                    <el-collapse-item name="1">
+                      <template #title>
+                        <h4>How secure is my conversation data?</h4>
+                      </template>
+                      <div>
+                        All conversations are encrypted and stored securely. We do not use your conversations for training our models unless explicitly permitted. You can delete your conversation history at any time.
+                      </div>
+                    </el-collapse-item>
+                    
+                    <el-collapse-item name="2">
+                      <template #title>
+                        <h4>Can I export my conversations?</h4>
+                      </template>
+                      <div>
+                        Yes, you can export conversations in various formats including text and JSON. This feature is available in the conversation menu accessible from the three dots icon.
+                      </div>
+                    </el-collapse-item>
+                    
+                    <el-collapse-item name="3">
+                      <template #title>
+                        <h4>How do I switch between models during a conversation?</h4>
+                      </template>
+                      <div>
+                        You can change models at any time using the model selector dropdown in the chat header. The new model will be used for all subsequent messages in that conversation.
+                      </div>
+                    </el-collapse-item>
+                    
+                    <el-collapse-item name="4">
+                      <template #title>
+                        <h4>Is there a limit to how many messages I can send?</h4>
+                      </template>
+                      <div>
+                        There are no strict limits on the number of messages, but very long conversations may eventually experience context limitations. We recommend starting a new conversation for substantially different topics.
+                      </div>
+                    </el-collapse-item>
+                    
+                    <el-collapse-item name="5">
+                      <template #title>
+                        <h4>Can I use the AI Assistant offline?</h4>
+                      </template>
+                      <div>
+                        The AI Assistant requires an internet connection to function as it processes requests on our servers. We don't currently offer an offline mode.
+                      </div>
+                    </el-collapse-item>
+                  </el-collapse>
+                </div>
+              </section>
             </div>
-          </div>
-        </div>
-        
-        <div class="help-section" id="troubleshooting">
-          <h2><el-icon><Warning /></el-icon> Troubleshooting</h2>
-          <div class="section-content">
-            <div class="help-card">
-              <h3>Common Issues</h3>
-              <div class="accordion">
-                <el-collapse>
-                  <el-collapse-item title="I can't log in to my account" name="1">
-                    <p>Try these steps:</p>
-                    <ol>
-                      <li>Make sure you're using the correct email and password</li>
-                      <li>Reset your password if you've forgotten it</li>
-                      <li>Check if your account has been verified</li>
-                      <li>Clear your browser cache and cookies</li>
-                    </ol>
-                  </el-collapse-item>
-                  <el-collapse-item title="The AI isn't responding correctly" name="2">
-                    <p>To get better responses:</p>
-                    <ul>
-                      <li>Try rephrasing your question</li>
-                      <li>Be more specific in your request</li>
-                      <li>Break complex questions into smaller parts</li>
-                      <li>Check your internet connection</li>
-                    </ul>
-                  </el-collapse-item>
-                  <el-collapse-item title="I'm experiencing slow performance" name="3">
-                    <p>If the application feels slow:</p>
-                    <ul>
-                      <li>Check your internet connection</li>
-                      <li>Try using a different browser</li>
-                      <li>Close unnecessary browser tabs</li>
-                      <li>Clear your browser cache</li>
-                    </ul>
-                  </el-collapse-item>
-                </el-collapse>
-              </div>
-            </div>
-            
-            <div class="help-card">
-              <h3>Contact Support</h3>
-              <p>Still having issues? Our support team is here to help!</p>
-              <div class="support-options">
-                <el-button type="primary" class="support-button">
-                  <el-icon><Message /></el-icon> Email Support
-                </el-button>
-                <el-button class="support-button">
-                  <el-icon><ChatLineSquare /></el-icon> Live Chat
-                </el-button>
-              </div>
-              <p class="support-hours">Support hours: Monday to Friday, 9 AM - 6 PM ET</p>
-            </div>
-          </div>
-        </div>
+          </el-col>
+        </el-row>
       </div>
     </div>
     
@@ -215,7 +315,10 @@ import {
   QuestionFilled, 
   Connection,
   Setting,
-  InfoFilled
+  InfoFilled,
+  Star,
+  View,
+  VideoPlay
 } from '@element-plus/icons-vue'
 
 const router = useRouter()
@@ -260,8 +363,8 @@ const handleSearch = () => {
 }
 
 // Scroll to section
-const scrollToSection = (id: string) => {
-  const element = document.getElementById(id)
+const scrollToSection = (sectionId: string) => {
+  const element = document.getElementById(sectionId)
   if (element) {
     element.scrollIntoView({ behavior: 'smooth' })
   }
@@ -625,5 +728,124 @@ export default defineComponent({
   .app-header, .app-footer {
     padding: 0 15px;
   }
+}
+
+.help-navigation {
+  position: sticky;
+  top: 20px;
+  padding: 20px 0;
+}
+
+.help-menu {
+  border-right: none;
+}
+
+.help-contact {
+  margin-top: 40px;
+  padding: 20px;
+  background-color: var(--el-fill-color-light);
+  border-radius: 8px;
+  text-align: center;
+}
+
+.help-contact h4 {
+  margin-bottom: 16px;
+}
+
+.help-sections {
+  padding: 0 20px 40px;
+}
+
+.help-section-content {
+  margin-bottom: 40px;
+  scroll-margin-top: 20px;
+}
+
+.help-section-content h2 {
+  font-size: 24px;
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid var(--el-border-color-light);
+}
+
+.help-card {
+  background-color: var(--el-bg-color-page);
+  border-radius: 8px;
+  padding: 24px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.help-card h3 {
+  font-size: 20px;
+  margin-top: 0;
+  margin-bottom: 16px;
+  color: var(--el-color-primary);
+}
+
+.help-card h4 {
+  font-size: 16px;
+  margin: 20px 0 10px;
+}
+
+.video-placeholder {
+  height: 200px;
+  background-color: var(--el-fill-color);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.video-placeholder:hover {
+  background-color: var(--el-fill-color-dark);
+}
+
+.video-placeholder span {
+  margin-top: 12px;
+  font-weight: 500;
+}
+
+.model-card {
+  margin-bottom: 16px;
+}
+
+.model-header {
+  display: flex;
+  align-items: center;
+}
+
+.model-header h4 {
+  margin: 0;
+}
+
+.model-content {
+  padding-top: 8px;
+}
+
+.model-content p {
+  margin: 8px 0;
+}
+
+.feature-callout {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-top: 20px;
+  padding: 16px;
+  background-color: var(--el-color-info-light-9);
+  border-radius: 6px;
+}
+
+.feature-callout .el-icon {
+  color: var(--el-color-info);
+  margin-top: 2px;
+}
+
+.feature-callout p {
+  margin: 0;
 }
 </style> 
