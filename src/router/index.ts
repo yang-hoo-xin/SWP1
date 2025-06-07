@@ -18,6 +18,12 @@ const router = createRouter({
       meta: { requiresAuth: true }
     },
     {
+      path: '/help',
+      name: 'help',
+      component: () => import('../views/HelpView.vue'),
+      meta: { requiresAuth: false }
+    },
+    {
       path: '/about',
       name: 'about',
       // route level code-splitting
