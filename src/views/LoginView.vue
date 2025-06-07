@@ -198,7 +198,7 @@ import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { useAuthStore } from '../stores/auth'
-import authService from '../services/authService'
+import { authApi } from '../api/auth'
 
 // Router and auth store
 const router = useRouter()
@@ -261,8 +261,8 @@ const handleLogin = async () => {
         const logoElement = document.querySelector('.logo-animation');
         if (logoElement) logoElement.classList.add('pulse');
         
-        // 使用 authService 进行真实的API登录
-        const response = await authService.login(loginForm.username, loginForm.password);
+        // Use authApi for real API login
+        const response = await authApi.login(loginForm.username, loginForm.password);
         
         // Store authentication info
         authStore.login({
