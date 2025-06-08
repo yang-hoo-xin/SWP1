@@ -49,9 +49,31 @@
       </div>
 
       <div class="sidebar-footer">
+        <!-- 新增：用户资料区域 -->
+        <div class="user-profile" v-if="!sidebarCollapsed">
+          <div class="user-avatar-container" @click="showSettings = true; activeSettingsTab = 'profile'">
+            <img :src="userAvatar" alt="User Avatar" class="user-avatar" />
+            <div class="avatar-edit-overlay">
+              <el-icon><EditPen /></el-icon>
+            </div>
+          </div>
+          <div class="user-info">
+            <div class="user-name">{{ userInfo?.nickname || userInfo?.username || 'User' }}</div>
+            <div class="user-email">{{ userInfo?.email || '' }}</div>
+          </div>
+        </div>
+        <div class="user-profile-collapsed" v-else>
+          <div class="user-avatar-container" @click="showSettings = true; activeSettingsTab = 'profile'">
+            <img :src="userAvatar" alt="User Avatar" class="user-avatar" />
+            <div class="avatar-edit-overlay">
+              <el-icon><EditPen /></el-icon>
+            </div>
+          </div>
+        </div>
+        
         <div class="footer-buttons">
           <el-tooltip content="Settings" placement="right" :disabled="!sidebarCollapsed">
-            <el-button class="footer-btn" @click="showSettings = true">
+            <el-button class="footer-btn" @click="showSettings = true; activeSettingsTab = 'interface'">
               <div class="btn-icon-wrapper">
                 <el-icon class="footer-icon"><Setting /></el-icon>
               </div>
@@ -249,8 +271,53 @@
       width="500px"
       :close-on-click-modal="false"
     >
-      <el-tabs>
-        <el-tab-pane label="Interface">
+      <el-tabs v-model="activeSettingsTab">
+        <!-- 新增：用户资料选项卡 -->
+        <el-tab-pane label="Profile" name="profile">
+          <div class="profile-settings">
+            <div class="avatar-upload-section">
+              <h4>Profile Picture</h4>
+              <div class="avatar-preview">
+                <img :src="userAvatar" alt="User Avatar" class="user-avatar-large" />
+                <div class="avatar-actions">
+                  <el-upload
+                    class="avatar-uploader"
+                    action="#"
+                    :auto-upload="false"
+                    :show-file-list="false"
+                    :on-change="handleAvatarChange"
+                    accept="image/*"
+                  >
+                    <el-button type="primary">Change Avatar</el-button>
+                  </el-upload>
+                  <el-button v-if="avatarFile" type="success" @click="uploadAvatar">
+                    <el-icon><Upload /></el-icon> Upload
+                  </el-button>
+                </div>
+              </div>
+            </div>
+            
+            <div class="profile-info">
+              <h4>Profile Information</h4>
+              <el-form label-position="left" label-width="120px">
+                <el-form-item label="Username">
+                  <el-input v-model="userInfo.username" disabled />
+                </el-form-item>
+                <el-form-item label="Nickname">
+                  <el-input v-model="profileForm.nickname" placeholder="Enter your nickname" />
+                </el-form-item>
+                <el-form-item label="Email">
+                  <el-input v-model="userInfo.email" disabled />
+                </el-form-item>
+                <el-form-item>
+                  <el-button type="primary" @click="updateProfile">Save Profile</el-button>
+                </el-form-item>
+              </el-form>
+            </div>
+          </div>
+        </el-tab-pane>
+        
+        <el-tab-pane label="Interface" name="interface">
           <h4>Appearance</h4>
           <el-form label-position="left" label-width="120px">
             <el-form-item label="Dark Mode">
@@ -323,7 +390,11 @@ import { ElMessage } from 'element-plus'
 import { useAuthStore } from '../stores/auth'
 import hljs from 'highlight.js'
 import { marked } from 'marked'
-import chatService, { ChatRequest } from '../services/chatService'
+import chatService from '../services/chatService'
+import type { ChatRequest } from '../services/chatService'
+import { authApi } from '../api/auth'
+import { userApi } from '../api/user'
+import type { UserInfo } from '../types/user'
 
 // Router and auth store
 const router = useRouter()
@@ -334,6 +405,126 @@ const sidebarCollapsed = ref(false)
 const showSettings = ref(false)
 const showModelDropdown = ref(false)
 const messagesContainer = ref<HTMLElement | null>(null)
+const activeSettingsTab = ref('interface')
+
+// User profile
+const userInfo = ref<UserInfo>({ 
+  id: 0, 
+  username: '', 
+  nickname: '', 
+  email: '', 
+  avatar: '',
+  roles: []
+})
+
+const profileForm = reactive({
+  nickname: ''
+})
+const avatarFile = ref<File | null>(null)
+const avatarPreview = ref('')
+
+// 获取用户信息
+const fetchUserInfo = async () => {
+  try {
+    const userData = await authApi.getCurrentUser()
+    if (userData) {
+      userInfo.value = userData
+      profileForm.nickname = userData.nickname || ''
+      if (userData.avatar) {
+        userAvatar.value = userData.avatar
+      }
+    }
+  } catch (error) {
+    console.error('Failed to fetch user info:', error)
+  }
+}
+
+// 处理头像更改
+const handleAvatarChange = (file: any) => {
+  const isImage = file.raw.type.startsWith('image/')
+  const isLt2M = file.raw.size / 1024 / 1024 < 2
+
+  if (!isImage) {
+    ElMessage.error('Avatar must be an image file!')
+    return
+  }
+  
+  if (!isLt2M) {
+    ElMessage.error('Avatar size can not exceed 2MB!')
+    return
+  }
+  
+  avatarFile.value = file.raw
+  
+  // 创建图片预览
+  const reader = new FileReader()
+  reader.onload = (e) => {
+    avatarPreview.value = e.target?.result as string
+    userAvatar.value = e.target?.result as string
+  }
+  reader.readAsDataURL(file.raw)
+}
+
+// 上传头像
+const uploadAvatar = async () => {
+  if (!avatarFile.value) {
+    ElMessage.warning('Please select a file first')
+    return
+  }
+  
+  try {
+    ElMessage.info('Uploading avatar...')
+    console.log('Avatar file to upload:', avatarFile.value)
+    
+    const formData = new FormData()
+    formData.append('file', avatarFile.value)
+    
+    // 输出FormData内容用于调试 (仅支持较新的浏览器)
+    try {
+      // @ts-ignore - FormData.entries() 在某些TS版本中可能没有正确的类型定义
+      for (let pair of formData.entries()) {
+        console.log('FormData content:', pair[0], pair[1])
+      }
+    } catch (e) {
+      console.log('Cannot log FormData entries:', e)
+    }
+    
+    // 调用上传API
+    const response = await userApi.uploadAvatar(formData)
+    console.log('Upload response:', response)
+    
+    if (response && response.avatarUrl) {
+      userInfo.value.avatar = response.avatarUrl
+      userAvatar.value = response.avatarUrl
+      ElMessage.success('Avatar uploaded successfully')
+      avatarFile.value = null
+    } else {
+      ElMessage.error('Upload failed: Invalid response format')
+      console.error('Invalid response format:', response)
+    }
+  } catch (error: any) {
+    console.error('Failed to upload avatar:', error)
+    const errorMessage = error.message || 'Unknown error'
+    ElMessage.error(`Failed to upload avatar: ${errorMessage}`)
+  }
+}
+
+// 更新用户资料
+const updateProfile = async () => {
+  try {
+    const response = await userApi.updateUserInfo({
+      nickname: profileForm.nickname
+    })
+    
+    if (response) {
+      userInfo.value = response
+      ElMessage.success('Profile updated successfully')
+    }
+  } catch (error) {
+    console.error('Failed to update profile:', error)
+    ElMessage.error('Failed to update profile')
+  }
+}
 
 // Chat state
 const userInput = ref('')
@@ -342,7 +533,7 @@ const streamingText = ref('')
 const deepThinkingMode = ref(false)
 
 // User avatar - can be from auth store in real implementation
-const userAvatar = ref('/src/assets/avatars/user-avatar.svg') 
+const userAvatar = ref(userInfo.value?.avatar || '/src/assets/avatars/user-avatar.svg')
 
 // Available models
 const availableModels = ref([
@@ -677,6 +868,9 @@ onMounted(() => {
   if (route.query.showSettings === 'true') {
     showSettings.value = true
   }
+  
+  // 其他已有的onMounted逻辑
+  fetchUserInfo()
 })
 </script>
 
@@ -1387,5 +1581,138 @@ onMounted(() => {
 .action-btn:hover {
   background-color: rgba(0, 0, 0, 0.05);
   color: var(--el-color-primary);
+}
+
+/* User Profile in Sidebar */
+.user-profile {
+  display: flex;
+  align-items: center;
+  padding: 15px;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  background-color: rgba(0, 0, 0, 0.03);
+  margin-bottom: 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.user-profile:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.user-profile-collapsed {
+  display: flex;
+  justify-content: center;
+  padding: 10px 0;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  margin-bottom: 10px;
+}
+
+.user-avatar-container {
+  position: relative;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.user-avatar {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.avatar-edit-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.user-avatar-container:hover .avatar-edit-overlay {
+  opacity: 1;
+}
+
+.user-info {
+  margin-left: 15px;
+  flex-grow: 1;
+  overflow: hidden;
+}
+
+.user-name {
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.user-email {
+  font-size: 12px;
+  color: #666;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Profile Settings Tab */
+.profile-settings {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.avatar-upload-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.avatar-preview {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.user-avatar-large {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  margin-bottom: 20px;
+}
+
+.avatar-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.profile-info {
+  margin-top: 10px;
+}
+
+.dark-mode .user-profile {
+  border-top-color: rgba(255, 255, 255, 0.1);
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.dark-mode .user-profile:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+.dark-mode .user-email {
+  color: #bbb;
 }
 </style> 

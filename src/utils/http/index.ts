@@ -23,7 +23,7 @@ const createAxiosClient = (config?: AxiosRequestConfig): AxiosInstance => {
   // Request interceptor
   client.interceptors.request.use(
     (config) => {
-      console.log('Request being sent:', config.url, config.data);
+      console.log('Request being sent:', config.url, config.method, config.headers);
       const token = localStorage.getItem('token');
       if (token) {
         config.headers['Authorization'] = `Bearer ${token}`;
@@ -31,32 +31,45 @@ const createAxiosClient = (config?: AxiosRequestConfig): AxiosInstance => {
       return config;
     },
     (error) => {
+      console.error('Request interceptor error:', error);
       return Promise.reject(error);
     }
   );
 
   // Response interceptor
   client.interceptors.response.use(
-    (response) => {
-      console.log('Raw response received:', response);
+    (response: AxiosResponse) => {
+      console.log('Raw response received:', response.status, response.config.url);
+      console.log('Response data:', JSON.stringify(response.data).substring(0, 200) + '...');
+      
+      // 检查响应是否是二进制数据或者其他非标准格式
+      const contentType = response.headers['content-type'] || '';
+      if (contentType.includes('application/octet-stream') || 
+          contentType.includes('image/') ||
+          contentType.includes('application/pdf')) {
+        console.log('Binary or special content type detected:', contentType);
+        return response.data;
+      }
       
       // Check if response has data property
       if (response.data) {
         // Check if it's a standard API response format with code field
         if (response.data.code !== undefined) {
-          console.log('Standard API response detected');
+          console.log('Standard API response detected, code:', response.data.code);
           const apiResponse = response.data as ApiResponse<any>;
           
           if (apiResponse.code === 200) {
-            console.log('Success response with data:', apiResponse.data);
+            console.log('Success response with data structure:', 
+                      typeof apiResponse.data, 
+                      Array.isArray(apiResponse.data) ? 'array' : 'not array');
             return apiResponse.data;
           } else {
-            console.error('API Error:', apiResponse.message);
+            console.error('API Error:', apiResponse.code, apiResponse.message);
             return Promise.reject(new Error(apiResponse.message || 'Request failed'));
           }
         } else {
           // Direct data response (not wrapped in Result)
-          console.log('Non-standard API response, returning direct data:', response.data);
+          console.log('Non-standard API response, returning direct data type:', typeof response.data);
           return response.data;
         }
       }
@@ -66,12 +79,12 @@ const createAxiosClient = (config?: AxiosRequestConfig): AxiosInstance => {
       return null;
     },
     (error) => {
-      console.error('Request Error:', error);
+      console.error('Response interceptor error:', error);
       
       if (error.response) {
-        const { status, data } = error.response;
-        console.error('Error status:', status);
-        console.error('Error data:', data);
+        const { status, data, config } = error.response;
+        console.error(`Error ${status} for ${config?.method} ${config?.url}`);
+        console.error('Error response data:', data);
         
         // Extract error message if available in response
         let errorMessage = 'Request failed';
@@ -79,6 +92,8 @@ const createAxiosClient = (config?: AxiosRequestConfig): AxiosInstance => {
           errorMessage = data.message;
         } else if (typeof data === 'string') {
           errorMessage = data;
+        } else if (data && data.error) {
+          errorMessage = data.error;
         }
         
         // Handle 401 error - Unauthorized
