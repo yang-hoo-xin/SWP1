@@ -23,14 +23,14 @@
           </el-tooltip>
           <div class="session-actions">
             <el-button
-              type="text"
+              link
               size="small"
               @click.stop="showRenameDialog(session)"
             >
               <el-icon><Edit /></el-icon>
             </el-button>
             <el-button
-              type="text"
+              link
               size="small"
               @click.stop="confirmDeleteSession(session.id)"
             >
@@ -40,10 +40,10 @@
         </div>
       </div>
       <div class="sidebar-footer">
-        <el-button type="text" @click="openSettings">
+        <el-button link @click="openSettings">
           <el-icon><Setting /></el-icon> Settings
         </el-button>
-        <el-button type="text" @click="logout" class="logout-button">
+        <el-button link @click="logout" class="logout-button">
           <el-icon><SwitchButton /></el-icon> Log out
         </el-button>
       </div>

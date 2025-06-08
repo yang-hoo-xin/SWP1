@@ -25,6 +25,7 @@ export const userApi = {
       
       // 手动处理响应数据
       if (response && response.data && response.data.code === 200) {
+        console.log('Avatar upload successful');
         return response.data.data;
       } else if (response && response.data) {
         throw new Error(response.data.message || 'Upload failed');
@@ -43,6 +44,7 @@ export const userApi = {
    */
   updateUserInfo: async (userData: {nickname?: string}): Promise<UserInfo> => {
     try {
+      console.log('Sending profile update request');
       const response = await apiClient.put<ApiResponse<UserInfo>>('/user/profile', userData, {
         transformResponse: [(data) => {
           return typeof data === 'string' ? JSON.parse(data) : data;
@@ -50,6 +52,7 @@ export const userApi = {
       });
       
       if (response && response.data && response.data.code === 200) {
+        console.log('Profile update successful');
         return response.data.data;
       } else if (response && response.data) {
         throw new Error(response.data.message || 'Update failed');

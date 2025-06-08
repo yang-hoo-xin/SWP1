@@ -136,10 +136,15 @@ export const authApi = {
    * Get current user information
    * @returns Promise containing user information
    */
-  getCurrentUser: async () => {
+  getCurrentUser: async (): Promise<UserInfo> => {
     try {
-      const response = await apiClient.get('/auth/user');
-      return response;
+      const response = await apiClient.get<unknown, UserInfo>('/auth/user');
+      
+      if (response) {
+        return response;
+      } else {
+        throw new Error('Invalid response from server');
+      }
     } catch (error) {
       console.error('Failed to get user info:', error);
       throw error;

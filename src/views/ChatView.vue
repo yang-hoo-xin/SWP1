@@ -7,7 +7,7 @@
           <el-icon size="24"><ChatDotSquare /></el-icon>
           <span v-if="!sidebarCollapsed">AI Assistant</span>
         </div>
-        <el-button type="text" @click="sidebarCollapsed = !sidebarCollapsed">
+        <el-button link @click="sidebarCollapsed = !sidebarCollapsed">
           <el-icon><Fold v-if="!sidebarCollapsed" /><Expand v-else /></el-icon>
         </el-button>
       </div>
@@ -131,7 +131,7 @@
             type="primary" 
             :class="{'active': deepThinkingMode}"
             @click="toggleDeepThinking">
-            <el-icon><Lightbulb /></el-icon>
+            <el-icon><Lightning /></el-icon>
             <span>Deep Thinking {{ deepThinkingMode ? 'ON' : 'OFF' }}</span>
           </el-button>
           
@@ -195,10 +195,10 @@
               <div class="message-body" v-html="formatMessage(message.content)"></div>
               
               <div class="message-actions" v-if="message.role === 'assistant'">
-                <el-button size="small" text @click="copyMessage(message.content)" class="action-btn">
+                <el-button size="small" link @click="copyMessage(message.content)" class="action-btn">
                   <el-icon><CopyDocument /></el-icon>
                 </el-button>
-                <el-button size="small" text v-if="index === currentConversation?.messages.length - 1 && message.role === 'assistant'" class="action-btn">
+                <el-button size="small" link v-if="index === currentConversation?.messages.length - 1 && message.role === 'assistant'" class="action-btn">
                   <el-icon><RefreshLeft /></el-icon>
                 </el-button>
               </div>
@@ -395,6 +395,12 @@ import type { ChatRequest } from '../services/chatService'
 import { authApi } from '../api/auth'
 import { userApi } from '../api/user'
 import type { UserInfo } from '../types/user'
+import { 
+  ChatDotSquare, ChatLineRound, Fold, Expand, Plus, MoreFilled, 
+  Setting, SwitchButton, ArrowDown, Delete, CopyDocument, 
+  RefreshLeft, Upload, Picture, Position, EditPen, 
+  Lightning // 使用 Lightning 图标代替 Lightbulb
+} from '@element-plus/icons-vue'
 
 // Router and auth store
 const router = useRouter()
@@ -433,6 +439,7 @@ const fetchUserInfo = async () => {
       if (userData.avatar) {
         userAvatar.value = userData.avatar
       }
+      console.log('User profile loaded successfully')
     }
   } catch (error) {
     console.error('Failed to fetch user info:', error)
@@ -474,24 +481,14 @@ const uploadAvatar = async () => {
   
   try {
     ElMessage.info('Uploading avatar...')
-    console.log('Avatar file to upload:', avatarFile.value)
+    console.log('Preparing to upload avatar file')
     
     const formData = new FormData()
     formData.append('file', avatarFile.value)
     
-    // 输出FormData内容用于调试 (仅支持较新的浏览器)
-    try {
-      // @ts-ignore - FormData.entries() 在某些TS版本中可能没有正确的类型定义
-      for (let pair of formData.entries()) {
-        console.log('FormData content:', pair[0], pair[1])
-      }
-    } catch (e) {
-      console.log('Cannot log FormData entries:', e)
-    }
-    
     // 调用上传API
     const response = await userApi.uploadAvatar(formData)
-    console.log('Upload response:', response)
+    console.log('Avatar upload completed')
     
     if (response && response.avatarUrl) {
       userInfo.value.avatar = response.avatarUrl
@@ -500,7 +497,7 @@ const uploadAvatar = async () => {
       avatarFile.value = null
     } else {
       ElMessage.error('Upload failed: Invalid response format')
-      console.error('Invalid response format:', response)
+      console.error('Invalid response format from server')
     }
   } catch (error: any) {
     console.error('Failed to upload avatar:', error)
@@ -512,12 +509,14 @@ const uploadAvatar = async () => {
 // 更新用户资料
 const updateProfile = async () => {
   try {
+    console.log('Updating user profile...')
     const response = await userApi.updateUserInfo({
       nickname: profileForm.nickname
     })
     
     if (response) {
       userInfo.value = response
+      console.log('Profile updated successfully')
       ElMessage.success('Profile updated successfully')
     }
   } catch (error) {
