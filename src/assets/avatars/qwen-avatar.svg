@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="200px" height="200px" viewBox="0 0 200 200" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>Qianwen Avatar</title>
+    <defs>
+        <linearGradient x1="0%" y1="0%" x2="100%" y2="100%" id="linearGradient-1">
+            <stop stop-color="#06B6D4" offset="0%"></stop>
+            <stop stop-color="#3B82F6" offset="100%"></stop>
+        </linearGradient>
+        <circle id="path-2" cx="100" cy="100" r="100"></circle>
+    </defs>
+    <g id="Qianwen" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Avatar">
+            <mask id="mask-3" fill="white">
+                <use xlink:href="#path-2"></use>
+            </mask>
+            <use id="Background" fill="url(#linearGradient-1)" xlink:href="#path-2"></use>
+            <g id="Logo" mask="url(#mask-3)" fill="#FFFFFF">
+                <path d="M100,50 C129.7,50 154,74.3 154,104 C154,133.7 129.7,158 100,158 C70.3,158 46,133.7 46,104 C46,74.3 70.3,50 100,50 Z M100,70 C81.3,70 66,85.3 66,104 C66,122.7 81.3,138 100,138 C118.7,138 134,122.7 134,104 C134,85.3 118.7,70 100,70 Z" id="Circle" fill-rule="nonzero"></path>
+                <path d="M144,75 L144,133 C138.5,143.8 130.3,152.5 120,158.2 L120,75 L144,75 Z" id="Rectangle-Right"></path>
+                <path d="M80,75 L80,158.2 C69.7,152.5 61.5,143.8 56,133 L56,75 L80,75 Z" id="Rectangle-Left"></path>
+            </g>
+        </g>
+    </g>
+</svg> 

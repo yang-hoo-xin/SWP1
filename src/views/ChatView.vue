@@ -553,6 +553,12 @@ const availableModels = ref([
     name: 'DeepSeek Chat', 
     description: 'Optimized for conversational interactions',
     avatar: '/src/assets/avatars/deepseek-chat-avatar.svg'
+  },
+  { 
+    id: 'qwen-plus', 
+    name: 'Qianwen Plus', 
+    description: 'Alibaba Cloud\'s powerful conversational AI',
+    avatar: '/src/assets/avatars/qwen-avatar.svg'
   }
 ])
 

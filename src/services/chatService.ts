@@ -1,6 +1,7 @@
 // Chat service for interacting with AI model APIs
 import axios from 'axios'
-import { ref } from 'vue'
+import { chatApi } from '../api/chat'
+import type { ChatMessageDto, ChatRequestDto } from '../api/chat'
 
 export interface Message {
   role: 'user' | 'assistant' | 'system';
@@ -35,50 +36,80 @@ class ChatService {
   // Non-streaming chat completion
   async chatCompletion(request: ChatRequest): Promise<string> {
     try {
-      // In a real app, this would call your backend API
-      // const response = await axios.post('/api/chat/completion', request);
-      // return response.data.message;
+      // 转换请求格式
+      const apiRequest: ChatRequestDto = {
+        messages: request.messages.map(msg => ({
+          role: msg.role,
+          content: msg.content,
+          timestamp: msg.timestamp
+        })),
+        model: request.model,
+        temperature: request.temperature,
+        max_tokens: request.max_tokens,
+        deep_thinking: request.deep_thinking
+      }
       
-      // For development, return a mock response
-      console.log('Chat request:', request);
-      const randomIndex = Math.floor(Math.random() * mockResponses.length);
-      
-      // Simulate network delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      return mockResponses[randomIndex];
+      // 调用API
+      const response = await chatApi.chatWithAi(apiRequest)
+      return response.content
     } catch (error) {
-      console.error('Error in chat completion:', error);
-      throw new Error('Failed to get AI response');
+      console.error('Error in chat completion:', error)
+      throw new Error('Failed to get AI response')
     }
   }
 
   // Streaming chat completion
-  async streamChatCompletion(request: ChatRequest, callbacks: StreamCallbacks): Promise<void> {
+  async streamChatCompletion(request: ChatRequest, callbacks: StreamCallbacks): Promise<() => void> {
     try {
-      callbacks.onStart?.();
+      callbacks.onStart?.()
       
-      // In a real app, this would use server-sent events or websockets
-      // For development, simulate streaming with timeouts
-      console.log('Streaming chat request:', request);
-      
-      // Choose a random response
-      const randomIndex = Math.floor(Math.random() * mockResponses.length);
-      const fullResponse = mockResponses[randomIndex];
-      
-      // Stream the response character by character
-      let currentText = '';
-      for (const char of fullResponse) {
-        // Add a small random delay between tokens
-        await new Promise(resolve => setTimeout(resolve, 20 + Math.random() * 80));
-        currentText += char;
-        callbacks.onToken?.(char);
+      // 转换请求格式
+      const apiRequest: ChatRequestDto = {
+        messages: request.messages.map(msg => ({
+          role: msg.role,
+          content: msg.content,
+          timestamp: msg.timestamp
+        })),
+        model: request.model,
+        temperature: request.temperature,
+        max_tokens: request.max_tokens,
+        deep_thinking: request.deep_thinking
       }
       
-      callbacks.onComplete?.(fullResponse);
+      let fullResponse = ''
+      
+      // 调用流式API
+      const cancelStreaming = chatApi.streamChatWithAi(
+        apiRequest,
+        (token) => {
+          fullResponse += token
+          callbacks.onToken?.(token)
+        },
+        () => {
+          callbacks.onComplete?.(fullResponse)
+        },
+        (error) => {
+          console.error('Error in streaming chat:', error)
+          callbacks.onError?.(error)
+        }
+      )
+      
+      // 返回取消函数
+      return cancelStreaming
     } catch (error) {
-      console.error('Error in streaming chat completion:', error);
-      callbacks.onError?.(error);
+      console.error('Error in streaming chat completion:', error)
+      callbacks.onError?.(error)
+      return () => {}
+    }
+  }
+  
+  // 切换AI模型
+  async switchModel(modelId: string): Promise<boolean> {
+    try {
+      return await chatApi.switchModel(modelId)
+    } catch (error) {
+      console.error('Error switching model:', error)
+      throw new Error('Failed to switch AI model')
     }
   }
 }
