@@ -12,7 +12,7 @@ export interface ApiResponse<T> {
 // Create axios instance
 const createAxiosClient = (config?: AxiosRequestConfig): AxiosInstance => {
   const client = axios.create({
-    baseURL: 'http://localhost:8080',
+    baseURL: 'http://localhost:8080/api',
     timeout: 10000,
     headers: {
       'Content-Type': 'application/json',
@@ -45,14 +45,14 @@ const createAxiosClient = (config?: AxiosRequestConfig): AxiosInstance => {
         // Check if it's a standard API response format with code field
         if (response.data.code !== undefined) {
           console.log('Standard API response detected');
-          const { code, message, data } = response.data as ApiResponse<any>;
+          const apiResponse = response.data as ApiResponse<any>;
           
-          if (code === 200) {
-            console.log('Success response with data:', data);
-            return data;
+          if (apiResponse.code === 200) {
+            console.log('Success response with data:', apiResponse.data);
+            return apiResponse.data;
           } else {
-            console.error('API Error:', message);
-            return Promise.reject(new Error(message || 'Request failed'));
+            console.error('API Error:', apiResponse.message);
+            return Promise.reject(new Error(apiResponse.message || 'Request failed'));
           }
         } else {
           // Direct data response (not wrapped in Result)
@@ -69,17 +69,27 @@ const createAxiosClient = (config?: AxiosRequestConfig): AxiosInstance => {
       console.error('Request Error:', error);
       
       if (error.response) {
-        const { status } = error.response;
+        const { status, data } = error.response;
         console.error('Error status:', status);
-        console.error('Error data:', error.response.data);
+        console.error('Error data:', data);
+        
+        // Extract error message if available in response
+        let errorMessage = 'Request failed';
+        if (data && data.message) {
+          errorMessage = data.message;
+        } else if (typeof data === 'string') {
+          errorMessage = data;
+        }
         
         // Handle 401 error - Unauthorized
         if (status === 401) {
           localStorage.removeItem('token');
-          // 不再使用 window.location.href，而是触发一个自定义事件
+          // Trigger a custom event for authentication error
           const authErrorEvent = new CustomEvent('auth-error', { detail: { status } });
           window.dispatchEvent(authErrorEvent);
         }
+        
+        return Promise.reject(new Error(errorMessage));
       }
       
       return Promise.reject(error);

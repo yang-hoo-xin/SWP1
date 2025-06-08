@@ -145,7 +145,7 @@
 
           <div class="form-item-animated" style="animation-delay: 0.4s;">
             <div class="login-footer">
-              <p>Don't have an account? <el-link type="primary" @click="$router.push('/signup')" underline="never" class="hover-effect">Sign up</el-link></p>
+              <p>Don't have an account? <el-link type="primary" @click="$router.push('/register')" underline="never" class="hover-effect">Register</el-link></p>
             </div>
           </div>
         </div>
@@ -286,9 +286,13 @@ onMounted(() => {
 // Refresh captcha
 const refreshCaptcha = async () => {
   try {
+    // Store old UUID for debugging
+    const oldUuid = captchaUuid.value;
+    
     // Clear current captcha while loading
     captchaImage.value = '';
-    captchaUuid.value = '';
+    // Don't clear the UUID until we get a new one
+    // captchaUuid.value = '';
     
     // Show loading state
     loading.value = true;
@@ -297,10 +301,14 @@ const refreshCaptcha = async () => {
     const captchaData = await authApi.getCaptcha();
     console.log('Captcha data received:', captchaData);
     
-    if (captchaData && captchaData.img && captchaData.uuid) {
-      captchaImage.value = captchaData.img;
+    if (captchaData && captchaData.imageBase64 && captchaData.uuid) {
+      captchaImage.value = captchaData.imageBase64;
+      // Set the new UUID
       captchaUuid.value = captchaData.uuid;
-      console.log('Captcha loaded successfully, uuid:', captchaUuid.value);
+      console.log('Captcha loaded successfully, uuid changed from', oldUuid, 'to', captchaUuid.value);
+      
+      // 清空当前输入的验证码
+      loginForm.captcha = '';
     } else {
       throw new Error('Invalid captcha data received');
     }
@@ -324,6 +332,20 @@ const handleLogin = async () => {
   // Clear previous validation errors
   loginFormRef.value.clearValidate();
   
+  // Check if captcha is missing
+  if (!loginForm.captcha || loginForm.captcha.trim() === '') {
+    ElMessage.warning('Please enter the captcha code');
+    return;
+  }
+  
+  // Check if captchaUuid is missing
+  if (!captchaUuid.value) {
+    console.error('Missing captcha UUID');
+    ElMessage.warning('Captcha not loaded properly. Please refresh the page.');
+    refreshCaptcha();
+    return;
+  }
+  
   // Validate form before API call
   try {
     // Validate individual fields to get specific error messages
@@ -345,6 +367,13 @@ const handleLogin = async () => {
     // Show Logo animation
     const logoElement = document.querySelector('.logo-animation');
     if (logoElement) logoElement.classList.add('pulse');
+    
+    // Log what we're sending to the server
+    console.log('Submitting login with data:', {
+      username: loginForm.username,
+      captcha: loginForm.captcha,
+      captchaUuid: captchaUuid.value
+    });
     
     try {
       // Call login API with captcha

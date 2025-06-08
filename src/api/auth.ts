@@ -8,30 +8,18 @@ export const authApi = {
    * Get captcha image
    * @returns Promise containing captcha image and uuid
    */
-  getCaptcha: async (): Promise<{ uuid: string, img: string }> => {
+  getCaptcha: async (): Promise<{ uuid: string, imageBase64: string }> => {
     try {
-      // Try to get the captcha directly without type constraints
-      const response = await apiClient.get<any, any>('/api/captcha/generate');
+      // Updated endpoint with /api prefix to match backend context-path
+      const response = await apiClient.get<any, any>('/captcha/generate');
       console.log('Captcha API raw response:', response);
       
-      // Handle different response formats
-      if (response) {
-        // Check if response is already the expected format
-        if (typeof response === 'object' && 'uuid' in response && 'img' in response) {
-          console.log('Captcha response in direct format');
+      if (response && typeof response === 'object') {
+        // Extract uuid and img from the response
+        if ('uuid' in response && 'img' in response) {
           return {
-            uuid: response.uuid as string,
-            img: response.img as string
-          };
-        }
-        
-        // Check if the response has a data property (Result wrapper)
-        if (typeof response === 'object' && response.data && 
-            typeof response.data === 'object' && 'uuid' in response.data && 'img' in response.data) {
-          console.log('Captcha response in wrapped format');
-          return {
-            uuid: response.data.uuid as string,
-            img: response.data.img as string
+            uuid: response.uuid,
+            imageBase64: response.img
           };
         }
       }
@@ -75,8 +63,8 @@ export const authApi = {
         };
       }
       
-      // Send login request to backend
-      const response = await apiClient.post<unknown, ApiResponse<{token: string, user: UserInfo}>>('/api/auth/login', { 
+      // Send login request to backend - /api is already in the URL
+      const response = await apiClient.post<unknown, any>('/auth/login', { 
         username, 
         password,
         captcha,
@@ -86,9 +74,10 @@ export const authApi = {
       
       console.log('Login response:', response);
       
-      // Extract data from response
-      if (response && response.data) {
-        const { token, user } = response.data;
+      // Extract data from response - response is the data property of the Result object
+      if (response && typeof response === 'object') {
+        // 在apiClient拦截器中已经提取了Result中的data字段
+        const { token, user } = response;
         
         // Save token
         if (token) {
@@ -121,9 +110,10 @@ export const authApi = {
         captcha: registerParams.captcha
       });
       
-      const response = await apiClient.post<unknown, ApiResponse<RegisterResponseData>>('/api/auth/register', {
+      const response = await apiClient.post<unknown, ApiResponse<any>>('/auth/register', {
         username: registerParams.username,
         password: registerParams.password,
+        confirmPassword: registerParams.confirmPassword,
         email: registerParams.email,
         captcha: registerParams.captcha,
         captchaUuid: registerParams.captchaUuid,
@@ -132,14 +122,10 @@ export const authApi = {
       
       console.log('Registration response:', response);
       
-      if (response) {
-        return { 
-          success: true,
-          message: 'Registration successful'
-        };
-      } else {
-        throw new Error('Invalid response format');
-      }
+      return { 
+        success: true,
+        message: 'Registration successful'
+      };
     } catch (error) {
       console.error('Registration failed:', error);
       throw error;
@@ -152,7 +138,7 @@ export const authApi = {
    */
   getCurrentUser: async () => {
     try {
-      const response = await apiClient.get('/api/auth/user');
+      const response = await apiClient.get('/auth/user');
       return response;
     } catch (error) {
       console.error('Failed to get user info:', error);
@@ -179,54 +165,31 @@ export const authApi = {
 
   /**
    * Send email verification code
-   * @param email Email address to send verification code to
-   * @returns Promise containing success result
+   * @param data Email and type
    */
-  sendEmailCode: async (email: string): Promise<{success: boolean, message: string}> => {
-    try {
-      console.log('Sending verification code to email:', email);
-      
-      const response = await apiClient.post<unknown, ApiResponse<{success: boolean}>>('/api/auth/email/code', { 
-        email,
-        type: 'register' // 可以是 'register' 或 'reset' 取决于用途
-      });
-      
-      console.log('Email verification code response:', response);
-      
-      return { 
-        success: true,
-        message: 'Verification code sent successfully'
-      };
-    } catch (error: any) {
-      console.error('Failed to send verification code:', error);
-      throw error;
-    }
+  sendEmailCode: async (data: { email: string, type: string }): Promise<any> => {
+    console.log(`Sending verification code to email: ${data.email}`);
+    return apiClient.post<unknown, ApiResponse<{success: boolean}>>('/auth/email/code', { 
+      email: data.email,
+      type: data.type
+    });
   },
 
   /**
    * Verify email code
-   * @param email Email address
-   * @param code Verification code
-   * @returns Promise containing verification result
+   * @param data Email and verification code
    */
-  verifyEmailCode: async (email: string, code: string): Promise<{success: boolean, message: string}> => {
-    try {
-      console.log('Verifying email code:', { email, code });
-      
-      const response = await apiClient.post<unknown, ApiResponse<{success: boolean}>>('/api/auth/email/verify', { 
-        email,
-        code
-      });
-      
-      console.log('Email verification response:', response);
-      
-      return { 
-        success: true,
-        message: 'Email verified successfully'
-      };
-    } catch (error: any) {
-      console.error('Failed to verify email code:', error);
-      throw error;
-    }
+  verifyEmailCode: async (data: { email: string, code: string }): Promise<any> => {
+    console.log(`Verifying email code: ${data.email}, ${data.code}`);
+    return apiClient.post<unknown, ApiResponse<{success: boolean}>>('/auth/email/verify', { 
+      email: data.email,
+      code: data.code
+    });
   },
-}; 
+};
+
+// Export email verification methods separately for easier import
+export const sendEmailCode = authApi.sendEmailCode;
+export const verifyEmailCode = authApi.verifyEmailCode;
+export const getCaptcha = authApi.getCaptcha;
+export const register = authApi.register; 

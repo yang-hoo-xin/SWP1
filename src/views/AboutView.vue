@@ -140,11 +140,11 @@ const values = ref([
   },
   {
     title: 'Transparency',
-    description: 'We're open about our capabilities and limitations, providing clear information about how our technology works.'
+    description: "We're open about our capabilities and limitations, providing clear information about how our technology works."
   },
   {
     title: 'Continuous Improvement',
-    description: 'We're committed to ongoing research and development to enhance our AI's capabilities.'
+    description: "We're committed to ongoing research and development to enhance our AI's capabilities."
   },
   {
     title: 'Privacy & Security',

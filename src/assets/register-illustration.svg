@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="500" height="400" viewBox="0 0 500 400" fill="none">
+  <!-- 背景元素 -->
+  <circle cx="250" cy="200" r="180" fill="#EBF2FF" opacity="0.5"/>
+  <circle cx="250" cy="200" r="120" fill="#D5E6FF" opacity="0.3"/>
+  
+  <!-- 设备外壳 -->
+  <rect x="130" y="100" width="240" height="180" rx="8" fill="#FFFFFF" stroke="#3A7BD5" stroke-width="3"/>
+  <rect x="142" y="118" width="216" height="144" rx="4" fill="#F5F7FA"/>
+  
+  <!-- 聊天界面元素 -->
+  <rect x="152" y="132" width="80" height="16" rx="8" fill="#E1ECFF"/>
+  <rect x="152" y="156" width="130" height="16" rx="8" fill="#E1ECFF"/>
+  
+  <rect x="200" y="188" width="140" height="16" rx="8" fill="#D1E2FF"/>
+  <rect x="226" y="212" width="114" height="16" rx="8" fill="#D1E2FF"/>
+  
+  <!-- 用户图标 -->
+  <circle cx="330" cy="150" r="18" fill="#3A7BD5" opacity="0.8"/>
+  <path d="M330 141C326.686 141 324 143.686 324 147C324 150.314 326.686 153 330 153C333.314 153 336 150.314 336 147C336 143.686 333.314 141 330 141Z" fill="white"/>
+  <path d="M330 156C325.029 156 321 160.029 321 165V166H339V165C339 160.029 334.971 156 330 156Z" fill="white"/>
+  
+  <!-- 用户图标2 -->
+  <circle cx="182" cy="200" r="16" fill="#5E66FA" opacity="0.8"/>
+  <path d="M182 192C179.239 192 177 194.239 177 197C177 199.761 179.239 202 182 202C184.761 202 187 199.761 187 197C187 194.239 184.761 192 182 192Z" fill="white"/>
+  <path d="M182 204C177.582 204 174 207.582 174 212V213H190V212C190 207.582 186.418 204 182 204Z" fill="white"/>
+  
+  <!-- 装饰元素 -->
+  <circle cx="140" cy="290" r="40" fill="#5E66FA" opacity="0.1"/>
+  <circle cx="380" cy="110" r="30" fill="#3A7BD5" opacity="0.1"/>
+  
+  <!-- 连接线 -->
+  <path d="M120 280 L380 120" stroke="#3A7BD5" stroke-width="1" stroke-dasharray="4 4" opacity="0.5"/>
+  <path d="M150 340 L350 60" stroke="#5E66FA" stroke-width="1" stroke-dasharray="4 4" opacity="0.5"/>
+  
+  <!-- 装饰图形 -->
+  <path d="M380 240 L410 240 L395 270 Z" fill="#3A7BD5" opacity="0.6"/>
+  <path d="M90 170 L120 170 L105 140 Z" fill="#5E66FA" opacity="0.6"/>
+  <rect x="90" y="250" width="20" height="20" rx="4" fill="#3A7BD5" opacity="0.6"/>
+  <rect x="400" y="180" width="20" height="20" rx="10" fill="#5E66FA" opacity="0.6"/>
+  
+  <!-- 动态标记 -->
+  <circle cx="430" cy="220" r="8" fill="#3A7BD5">
+    <animate attributeName="opacity" values="0.2;0.8;0.2" dur="2s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="70" cy="200" r="8" fill="#5E66FA">
+    <animate attributeName="opacity" values="0.8;0.2;0.8" dur="2s" repeatCount="indefinite"/>
+  </circle>
+</svg> 
