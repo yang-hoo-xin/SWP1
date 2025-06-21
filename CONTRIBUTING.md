@@ -1,71 +1,117 @@
-# Contributing to SWP1 Backend
+# Contributing to OSSWproject_SmartAIChatbot Frontend
 
-Thank you for considering contributing to our backend project! This document provides guidelines for contributing to make the process smooth and effective.
+Thank you for your interest in contributing to our frontend project! This document provides guidelines to help you contribute effectively.
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js (v16 or higher)
+- npm or yarn
+- Git
+
+### Setup Development Environment
+
+1. Fork the repository
+2. Clone your fork:
+   ```bash
+   git clone https://github.com/YOUR_USERNAME/OSSWproject_SmartAIChatbot.git
+   cd OSSWproject_SmartAIChatbot
+   ```
+3. Install dependencies:
+   ```bash
+   npm install
+   # or
+   yarn install
+   ```
+4. Start the development server:
+   ```bash
+   npm run dev
+   # or
+   yarn dev
+   ```
 
 ## How to Contribute
 
 ### Reporting Issues
 
-If you find a bug or have a suggestion:
+Before submitting an issue:
+- Check if the issue already exists
+- Use the issue template if available
+- Include browser information and screenshots if relevant
 
-1. Check if the issue already exists in the [Issues](https://github.com/yang-hoo-xin/SWP1/issues) section
-2. If not, create a new issue with a clear description, steps to reproduce, and relevant information
+### Pull Request Process
 
-### Code Contributions
+1. Create a new branch from `main`:
+   ```bash
+   git checkout -b feature/your-feature-name
+   ```
+2. Make your changes
+3. Test your changes thoroughly
+4. Commit your changes following our commit message conventions
+5. Push to your fork
+6. Submit a pull request to the `main` branch
 
-1. Fork the repository
-2. Create a new branch: `git checkout -b feature/your-feature-name`
-3. Make your changes
-4. Run tests to ensure your changes don't break existing functionality
-5. Commit your changes with clear messages
-6. Push to your fork
-7. Submit a Pull Request
+### Coding Standards
 
-## Development Setup
+- Follow the project's ESLint and Prettier configurations
+- Write clean, readable, and maintainable code
+- Add comments for complex logic
+- Ensure responsive design works on different screen sizes
+- Maintain accessibility standards (WCAG)
 
-```bash
-# Clone the repository
-git clone https://github.com/yang-hoo-xin/SWP1.git
-cd SWP1
+### Component Guidelines
 
-# Install dependencies
-mvn install
+- Create reusable components when possible
+- Follow the project's component structure
+- Use proper naming conventions
+- Include PropTypes or TypeScript types
+- Write unit tests for components
 
-# Run the application
-mvn spring-boot:run
-```
+### CSS/Styling
 
-## Coding Standards
+- Follow the project's styling approach (CSS Modules, Styled Components, etc.)
+- Maintain consistent naming conventions
+- Ensure responsive design
+- Consider dark mode if applicable
 
-- Follow Java code conventions
-- Use 4 spaces for indentation
-- Write clear and concise comments
-- Include JavaDoc for public methods
-- Write unit tests for new features
+### Testing
 
-## Commit Guidelines
+- Write unit tests for components and utilities
+- Ensure tests pass before submitting PR
+- Add integration tests for complex features
 
-- Use clear and descriptive commit messages
-- Reference issue numbers when applicable
-- Keep commits focused on a single change
+### Documentation
 
-## Pull Request Process
+- Update documentation for new features or changes
+- Document props for new components
+- Add JSDoc comments for functions and methods
 
-1. Update the README.md if necessary
-2. Update documentation for any changed functionality
-3. Ensure all tests pass
-4. Wait for code review and address any feedback
+## Commit Message Guidelines
+
+Format: `type(scope): subject`
+
+Types:
+- `feat`: New feature
+- `fix`: Bug fix
+- `docs`: Documentation changes
+- `style`: Code style changes (formatting, etc.)
+- `refactor`: Code refactoring
+- `test`: Adding or updating tests
+- `chore`: Maintenance tasks
+
+Example: `feat(auth): add login form component`
+
+## Code Review Process
+
+- All PRs require at least one review
+- Address review comments promptly
+- Maintainers may request changes before merging
 
 ## Contact
 
-If you have any questions or need assistance, please feel free to contact the project maintainer:
+If you have questions or need help, please contact:
+- Email: 3266303694@qq.com
+- Issue tracker: [GitHub Issues](https://github.com/VikaKumaChR/OSSWproject_SmartAIChatbot/issues)
 
-Email: 3266303694@qq.com
-
-## Code of Conduct
-
-- Be respectful and inclusive
-- Accept constructive criticism
-- Focus on what is best for the community
-
-Thank you for your contributions!
+Thank you for contributing to our project!
