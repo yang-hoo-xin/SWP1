@@ -2,6 +2,11 @@
 
 A modern, responsive Vue.js application for interacting with AI models through a conversational interface. This project serves as the frontend for the AI Chat Assistant platform, providing user authentication, conversation management, and real-time chat capabilities.
 
+##Contributors
+xingyangccd（희건춘）
+VikaKumaChR (배민웅)
+yang-hoo-xin(양호신)
+(정민직)
 ## 🚀 Technologies
 
 - **Framework**: [Vue.js 3](https://vuejs.org/) with Composition API
